@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#10b981" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Une application pour annoter des images anatomiques avec des masques et des catégories personnalisées.">
+  <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/180/000000/heart-with-pulse.png">
+  <link rel="icon" href="https://img.icons8.com/fluency/48/000000/heart-with-pulse.png">
+  <title>Anatomy Annotator 🫀</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="manifest" href="/manifest.json" />
+  <style>
+    :root {
+      --primary-color: #10b981;
+      --secondary-color: #6ee7b7;
+      --accent-color: #34d399;
+      --bg-light: #ffffff;
+      --bg-dark: #064e3b;
+      --text-light: #1f2937;
+      --text-dark: #ffffff;
+      --canvas-bg: #e5e7eb;
+      --cat2-color: #16a34a;
+      --cat3-color: #2563eb;
+      --cat4-color: #d97706;
+      --button-gradient: linear-gradient(45deg, #34d399, #6ee7b7);
+    }
+
+    [data-theme="dark"] {
+      --primary-color: #34d399;
+      --secondary-color: #a7f3d0;
+      --accent-color: #4ade80;
+      --bg-light: #064e3b;
+      --bg-dark: #022c22;
+      --text-light: #ffffff;
+      --text-dark: #e5e7eb;
+      --canvas-bg: #374151;
+      --button-gradient: linear-gradient(45deg, #4ade80, #a7f3d0);
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      background: linear-gradient(270deg, var(--primary-color), var(--secondary-color));
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+      color: var(--text-light);
+      margin: 0;
+      padding: 0;
+      transition: all 0.3s ease;
+      overflow-x: hidden;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .title-bar {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+      padding: 10px 15px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.3s ease;
+    }
+
+    .title-bar:hover {
+      transform: translateY(-2px);
+    }
+
+    .title-bar h1 {
+      font-size: clamp(20px, 5vw, 24px);
+      font-weight: 700;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title-bar img {
+      width: clamp(30px, 8vw, 36px);
+      height: clamp(30px, 8vw, 36px);
+    }
+
+    .main-container {
+      margin-top: 60px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: calc(100vh - 60px);
+      gap: 15px;
+    }
+
+    .canvas-wrapper {
+      background: var(--bg-light);
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 1200px;
+      position: relative;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .canvas-wrapper:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .canvas-area {
+      width: 100%;
+      height: clamp(300px, 60vh, 500px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+
+    #canvas {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 8px;
+      border: 3px solid var(--primary-color);
+      cursor: crosshair;
+      touch-action: none;
+    }
+
+    .no-image-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dark);
+      text-align: center;
+      background: var(--canvas-bg);
+      border-radius: 8px;
+    }
+
+    .no-image-placeholder img {
+      width: clamp(60px, 15vw, 80px);
+      height: clamp(60px, 15vw, 80px);
+      margin-bottom: 15px;
+      transition: transform 0.3s ease;
+    }
+
+    .no-image-placeholder img:hover {
+      transform: scale(1.1);
+    }
+
+    .no-image-placeholder h5 {
+      font-size: clamp(18px, 4vw, 20px);
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--primary-color);
+    }
+
+    .no-image-placeholder p {
+      font-size: clamp(14px, 3.5vw, 16px);
+      max-width: 90%;
+      color: var(--secondary-color);
+    }
+
+    .category-panel {
+      background: var(--bg-light);
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .category-panel:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    [data-theme="dark"] .category-panel {
+      background: var(--bg-dark);
+    }
+
+    .category-panel button {
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: clamp(12px, 3vw, 14px);
+      text-align: left;
+      color: var(--text-dark) !important;
+      transition: all 0.3s ease;
+    }
+
+    .category-panel button i {
+      font-size: clamp(12px, 3vw, 14px);
+    }
+
+    .category-panel button#cat1 { background: var(--cat2-color); }
+    .category-panel button#cat2 { background: var(--cat3-color); }
+    .category-panel button#cat3 { background: var(--cat4-color); }
+    .category-panel button#addCategoryBtn { background: var(--button-gradient); }
+    .category-panel button#deleteCategoryBtn { background: var(--button-gradient); }
+
+    .category-panel button:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 8px var(--accent-color);
+    }
+
+    .category-panel button.active {
+      background: var(--accent-color);
+    }
+
+    .toolbar {
+      width: 100%;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 8px 12px;
+      border-radius: 20px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      flex-wrap: wrap;
+    }
+
+    .left-buttons, .right-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .bottom-right-toolbar {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      display: flex;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 8px 12px;
+      border-radius: 20px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .toolbar button, .bottom-right-toolbar button {
+      width: clamp(32px, 10vw, 36px);
+      height: clamp(32px, 10vw, 36px);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(16px, 4vw, 18px);
+      background: var(--button-gradient);
+      color: var(--text-dark);
+      transition: all 0.3s ease;
+    }
+
+    .toolbar button:hover, .bottom-right-toolbar button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 12px var(--accent-color);
+    }
+
+    .tooltip-inner {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+      font-family: "Inter", sans-serif;
+      font-size: clamp(12px, 3vw, 14px);
+      padding: 6px 10px;
+      border-radius: 6px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .progress-container {
+      height: 4px;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.1);
+      position: fixed;
+      top: 50px;
+      left: 0;
+      z-index: 1001;
+    }
+
+    .progress-bar {
+      height: 4px;
+      background: var(--button-gradient);
+      width: 0%;
+      transition: width 0.3s ease-in-out;
+    }
+
+    .toast {
+      border-radius: 10px;
+      background: var(--bg-dark);
+      color: var(--text-dark);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--primary-color);
+      position: fixed;
+      bottom: 15px;
+      right: 15px;
+      max-width: 90%;
+    }
+
+    .toast.bg-info {
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      right: auto;
+    }
+
+    .modal-content {
+      background: var(--bg-light);
+      color: var(--text-light);
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      border: none;
+      transition: transform 0.3s ease;
+    }
+
+    .modal-content:hover {
+      transform: translateY(-5px);
+    }
+
+    [data-theme="dark"] .modal-content {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .modal-content .btn-close {
+      filter: invert(1);
+    }
+
+    [data-theme="dark"] .modal-content .btn-close {
+      filter: none;
+    }
+
+    .modal-content .btn-primary {
+      background: var(--primary-color);
+      color: var(--text-dark);
+      border: none;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .modal-content .btn-primary:hover {
+      background: var(--secondary-color);
+      transform: scale(1.03);
+    }
+
+    .modal-content .form-check-label {
+      color: var(--text-light);
+    }
+
+    [data-theme="dark"] .modal-content .form-check-label {
+      color: var(--text-dark);
+    }
+
+    .btn-danger {
+      background: #dc2626;
+      border: none;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-danger:hover {
+      background: #b91c1c;
+      transform: scale(1.03);
+    }
+
+    .modal-header {
+      border-bottom: none;
+      padding: 1.5rem 2rem;
+      background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+      color: var(--text-dark);
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+    }
+
+    .modal-footer {
+      border-top: none;
+      padding: 1rem 2rem;
+      justify-content: space-between;
+    }
+
+    .modal-body {
+      padding: 1.5rem 2rem;
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .modal-body strong {
+      color: var(--primary-color);
+    }
+
+    .modal-body p {
+      margin-bottom: 0.75rem;
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: var(--bg-dark);
+      color: var(--text-dark);
+      margin-top: auto;
+      width: 100%;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    @media (min-width: 768px) {
+      .main-container {
+        flex-direction: row;
+        justify-content: center;
+        gap: 20px;
+      }
+
+      .canvas-wrapper {
+        max-width: 800px;
+      }
+
+      .category-panel {
+        width: 250px;
+        max-width: none;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .title-bar {
+        padding: 8px 10px;
+      }
+
+      .main-container {
+        margin-top: 50px;
+        padding: 10px;
+      }
+
+      .canvas-area {
+        height: clamp(250px, 50vh, 350px);
+      }
+
+      .toolbar {
+        padding: 6px 10px;
+      }
+
+      .bottom-right-toolbar {
+        padding: 6px 10px;
+      }
+
+      .toast {
+        bottom: 10px;
+        right: 10px;
+        font-size: clamp(12px, 3vw, 14px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="title-bar">
+    <h1><img src="https://img.icons8.com/fluency/48/000000/heart-with-pulse.png" alt="Heart" /> Anatomy Annotator 🫀</h1>
+  </div>
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div class="main-container">
+    <div class="canvas-wrapper">
+      <div class="toolbar" id="toolbar">
+        <div class="left-buttons">
+          <button class="btn" id="newImageBtn" data-bs-toggle="tooltip" data-bs-placement="top" title="Charger">
+            <i class="fas fa-download"></i>
+          </button>
+          <button class="btn" id="saveBtn" data-bs-toggle="tooltip" data-bs-placement="top" title="Enregistrer">
+            <i class="fas fa-save"></i>
+          </button>
+          <button class="btn" id="historyBtn" data-bs-toggle="tooltip" data-bs-placement="top" title="Historique">
+            <i class="fas fa-history"></i>
+          </button>
+          <button class="btn" id="toggleAnnotationsBtn" data-bs-toggle="tooltip" data-bs-placement="top" title="Afficher/Masquer">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+        <div class="right-buttons">
+          <button class="btn" id="themeToggleBtn" data-bs-toggle="tooltip" data-bs-placement="top" title="Thème">
+            <i class="fas fa-moon"></i>
+          </button>
+          <button class="btn" id="tutorialBtn" data-bs-toggle="tooltip" data-bs-placement="top" title="Aide">
+            <i class="fas fa-question-circle"></i>
+          </button>
+          <button class="btn" id="backBtn" data-bs-toggle="tooltip" data-bs-placement="top" title="Retour">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+        </div>
+      </div>
+      <div class="canvas-area">
+        <div class="no-image-placeholder" id="noImagePlaceholder">
+          <img src="https://img.icons8.com/?size=100&id=114618&format=png" alt="X-Ray Person Icon" />
+          <h5>Prêt à disséquer ? 🩺🩻</h5>
+          <p>Charge une image et commence ton aventure anatomique !</p>
+        </div>
+        <canvas id="canvas" style="display: none"></canvas>
+        <div class="bottom-right-toolbar">
+          <button class="btn" id="undoBtn" data-bs-toggle="tooltip" data-bs-placement="top" title="Annuler">
+            <i class="fas fa-undo"></i>
+          </button>
+          <button class="btn" id="redoBtn" data-bs-toggle="tooltip" data-bs-placement="top" title="Refaire">
+            <i class="fas fa-redo"></i>
+          </button>
+          <button class="btn" id="clearAllBtn" data-bs-toggle="tooltip" data-bs-placement="top" title="Supprimer">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="category-panel">
+      <button class="btn btn-cystic-artery active" id="cat1" onclick="selectCategory(1)" data-bs-toggle="tooltip" data-bs-placement="top">
+        <i class="fas fa-project-diagram"></i> Artère Cystique
+      </button>
+      <button class="btn btn-cystic-duct" id="cat2" onclick="selectCategory(2)" data-bs-toggle="tooltip" data-bs-placement="top">
+        <i class="fas fa-water"></i> Canal Cystique
+      </button>
+      <button class="btn btn-gallbladder" id="cat3" onclick="selectCategory(3)" data-bs-toggle="tooltip" data-bs-placement="top">
+        <i class="fas fa-leaf"></i> Vésicule Biliaire
+      </button>
+      <button class="btn" id="addCategoryBtn" data-bs-toggle="modal" data-bs-target="#addCategoryModal" data-bs-toggle="tooltip" data-bs-placement="top">
+        <i class="fas fa-plus"></i> Nouvelle Catégorie
+      </button>
+      <button class="btn" id="deleteCategoryBtn" data-bs-toggle="tooltip" data-bs-placement="top">
+        <i class="fas fa-trash"></i> Supprimer Catégorie
+      </button>
+    </div>
+  </div>
+
+  <input type="file" id="imageInput" accept="image/jpeg,image/png,image/gif" style="display: none" />
+
+  <div class="modal fade" id="tutorialModal" tabindex="-1" aria-labelledby="tutorialModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-center w-100 fw-bold" id="tutorialModalLabel">Guide Anatomique 🩺</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="d-flex flex-column gap-3">
+            <div class="d-flex align-items-center gap-2">
+              <div>
+                <strong>1. Charger une image 📷</strong>
+                <p>Utilise le bouton "Charger" pour uploader ton image.</p>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <div>
+                <strong>2. Choisir une catégorie 🫀</strong>
+                <p>Sélectionne une structure anatomique à droite.</p>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <div>
+                <strong>3. Ajouter une catégorie ➕</strong>
+                <p>Ajoute des catégories personnalisées via le bouton dédié.</p>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <div>
+                <strong>4. Annoter ✍️</strong>
+                <p>Maintiens le clic ou le toucher pour dessiner un masque. Relâche pour finaliser.</p>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <div>
+                <strong>5. Sauvegarder 💾</strong>
+                <p>Enregistre en JSON et JPG.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="dontShowAgain" />
+            <label class="form-check-label" for="dontShowAgain">Ne plus afficher</label>
+          </div>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">C'est parti ! 🩺</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-center w-100" id="confirmModalLabel">Confirmation</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p id="confirmMessage"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-danger" id="confirmActionBtn">Confirmer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="imageChangeModal" tabindex="-1" aria-labelledby="imageChangeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-center w-100" id="imageChangeModalLabel">Changer d'image</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Voulez-vous enregistrer vos annotations avant de charger une nouvelle image ?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-primary" id="saveAndChangeBtn">Enregistrer et changer</button>
+          <button type="button" class="btn btn-danger" id="changeWithoutSavingBtn">Changer sans enregistrer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-center w-100" id="addCategoryModalLabel">Ajouter une nouvelle catégorie</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="categoryNameInput" class="form-label">Nom de la catégorie</label>
+            <input type="text" class="form-control" id="categoryNameInput" placeholder="Entrez le nom de la catégorie" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-primary" id="confirmAddCategoryBtn">Ajouter</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-center w-100" id="historyModalLabel">Historique des images annotées</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <ul class="list-group" id="historyList"></ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2025 Anatomy Annotator – Tous droits réservés.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          .then(reg => console.log('Service Worker registered:', reg.scope))
+          .catch(err => console.error('Service Worker registration failed:', err));
+      });
+    }
+
+    let deferredPrompt;
+
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const placeholder = document.getElementById("noImagePlaceholder");
+    const wrapper = document.querySelector(".canvas-wrapper");
+    let image = null;
+    const annotations = [];
+    let undoneAnnotations = [];
+    let currentCategory = 1;
+    let maskPoints = [];
+    let isDrawing = false;
+    let imageId = 1;
+    let annotationId = 0;
+    let zoomLevel = 1;
+    let nextCategoryId = 4;
+    let colorIndex = 0;
+    let showAnnotations = true;
+    let isSaved = true;
+    let isViewOnly = false;
+    let sessionAnnotatedImages = localStorage.getItem("lastAnnotatedImage") ? [localStorage.getItem("lastAnnotatedImage")] : [];
+
+    const categories = {
+      1: { name: "cystic_artery", color: "rgb(22, 163, 74)", supercategory: "anatomy", displayName: "Artère Cystique" },
+      2: { name: "cystic_duct", color: "rgb(37, 99, 235)", supercategory: "anatomy", displayName: "Canal Cystique" },
+      3: { name: "gallbladder", color: "rgb(217, 119, 6)", supercategory: "anatomy", displayName: "Vésicule Biliaire" },
+    };
+
+    const presetColors = ['#d97706', '#16a34a', '#7c3aed', '#b91c1c', '#059669', '#6d28d9', '#b45309', '#047857'];
+
+    function hexToRgba(hex, alpha) {
+      try {
+        hex = hex.replace('#', '');
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+      } catch (e) {
+        console.error("Error in hexToRgba:", e);
+        return `rgba(128, 128, 128, ${alpha})`;
+      }
+    }
+
+    function getNextColor() {
+      const color = presetColors[colorIndex];
+      colorIndex = (colorIndex + 1) % presetColors.length;
+      return color;
+    }
+
+    function getRandomIcon() {
+      const icons = [
+        'fa-heart',
+        'fa-lungs',
+        'fa-bone',
+        'fa-vial',
+        'fa-syringe',
+        'fa-stethoscope',
+        'fa-dna',
+        'fa-microscope'
+      ];
+      return icons[Math.floor(Math.random() * icons.length)];
+    }
+
+    function addNewCategory(categoryName) {
+      try {
+        if (!categoryName) {
+          showNotification("Nom de catégorie requis 😕", "warning");
+          return;
+        }
+
+        const categoryId = nextCategoryId++;
+        const color = getNextColor();
+        const iconClass = getRandomIcon();
+        categories[categoryId] = {
+          name: categoryName.toLowerCase().replace(/\s+/g, '_'),
+          color: color,
+          supercategory: "custom",
+          displayName: categoryName,
+        };
+
+        const categoryPanel = document.querySelector(".category-panel");
+        const newButton = document.createElement("button");
+        newButton.className = "btn";
+        newButton.id = `cat${categoryId}`;
+        newButton.setAttribute("onclick", `selectCategory(${categoryId})`);
+        newButton.setAttribute("data-bs-toggle", "tooltip");
+        newButton.setAttribute("data-bs-placement", "top");
+        newButton.style.background = color;
+        newButton.innerHTML = `<i class="fas ${iconClass}"></i> ${categoryName}`;
+
+        const addCategoryBtn = document.getElementById("addCategoryBtn");
+        categoryPanel.insertBefore(newButton, addCategoryBtn);
+
+        new bootstrap.Tooltip(newButton);
+        selectCategory(categoryId);
+        showNotification(`Catégorie "${categoryName}" ajoutée ! 🫀`);
+        isSaved = false;
+      } catch (e) {
+        console.error("Error in addNewCategory:", e);
+        showNotification("Erreur lors de l'ajout de la catégorie 😕", "danger");
+      }
+    }
+
+    function showConfirmModal(title, message, confirmCallback, cancelCallback) {
+      try {
+        const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        document.getElementById('confirmModalLabel').textContent = title;
+        document.getElementById('confirmMessage').textContent = message;
+        const confirmBtn = document.getElementById('confirmActionBtn');
+        const cancelBtn = document.querySelector('#confirmModal .btn-secondary');
+
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+        newConfirmBtn.addEventListener('click', () => {
+          confirmCallback();
+          modal.hide();
+        });
+
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+
+        newCancelBtn.addEventListener('click', () => {
+          if (cancelCallback) cancelCallback();
+          modal.hide();
+        });
+
+        modal.show();
+      } catch (e) {
+        console.error("Error in showConfirmModal:", e);
+        showNotification("Erreur lors de l'affichage de la confirmation 😕", "danger");
+      }
+    }
+
+    function showImageChangeModal(file) {
+      try {
+        const modal = new bootstrap.Modal(document.getElementById('imageChangeModal'));
+        const saveAndChangeBtn = document.getElementById('saveAndChangeBtn');
+        const changeWithoutSavingBtn = document.getElementById('changeWithoutSavingBtn');
+        const cancelBtn = document.querySelector('#imageChangeModal .btn-secondary');
+
+        const newSaveAndChangeBtn = saveAndChangeBtn.cloneNode(true);
+        saveAndChangeBtn.parentNode.replaceChild(newSaveAndChangeBtn, saveAndChangeBtn);
+
+        newSaveAndChangeBtn.addEventListener('click', () => {
+          saveAll();
+          checkAndLoadImage(file);
+          modal.hide();
+        });
+
+        const newChangeWithoutSavingBtn = changeWithoutSavingBtn.cloneNode(true);
+        changeWithoutSavingBtn.parentNode.replaceChild(newChangeWithoutSavingBtn, changeWithoutSavingBtn);
+
+        newChangeWithoutSavingBtn.addEventListener('click', () => {
+          isSaved = true;
+          checkAndLoadImage(file);
+          modal.hide();
+        });
+
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+
+        newCancelBtn.addEventListener('click', () => {
+          modal.hide();
+        });
+
+        modal.show();
+      } catch (e) {
+        console.error("Error in showImageChangeModal:", e);
+        showNotification("Erreur lors de l'affichage de la confirmation 😕", "danger");
+      }
+    }
+
+    function showHistoryModal() {
+      try {
+        const modal = new bootstrap.Modal(document.getElementById('historyModal'));
+        const historyList = document.getElementById('historyList');
+        historyList.innerHTML = '';
+
+        if (sessionAnnotatedImages.length === 0) {
+          historyList.innerHTML = '<li class="list-group-item">Aucune image annotée dans cette session</li>';
+        } else {
+          sessionAnnotatedImages.forEach((imageName) => {
+            const listItem = document.createElement('li');
+            listItem.className = 'list-group-item';
+            listItem.textContent = imageName;
+            listItem.addEventListener('click', () => {
+              loadImageFromHistory(imageName);
+              modal.hide();
+            });
+            historyList.appendChild(listItem);
+          });
+        }
+
+        modal.show();
+      } catch (e) {
+        console.error("Error in showHistoryModal:", e);
+        showNotification("Erreur lors de l'affichage de l'historique 😕", "danger");
+      }
+    }
+
+    function loadImageFromHistory(imageName) {
+      try {
+        const imageInput = document.getElementById("imageInput");
+        imageInput.value = "";
+        showNotification("Veuillez sélectionner l'image correspondante 📷", "info");
+        imageInput.click();
+
+        imageInput.onchange = (e) => {
+          const file = e.target.files[0];
+          if (!file) {
+            showNotification("Aucune image sélectionnée 😕", "warning");
+            return;
+          }
+
+          if (file.name !== imageName) {
+            showNotification("L'image sélectionnée ne correspond pas à l'historique 😕", "warning");
+            return;
+          }
+
+          if (!isSaved && (annotations.length > 0 || maskPoints.length > 0)) {
+            showImageChangeModal(file);
+          } else {
+            checkAndLoadImage(file);
+          }
+        };
+      } catch (e) {
+        console.error("Error in loadImageFromHistory:", e);
+        showNotification("Erreur lors du chargement de l'image 😕", "danger");
+      }
+    }
+
+    function deleteCategory() {
+      try {
+        if (!categories[currentCategory]) {
+          showNotification("Aucune catégorie sélectionnée 😕", "warning");
+          return;
+        }
+
+        if ([1, 2, 3].includes(currentCategory)) {
+          showNotification("Les catégories par défaut ne peuvent pas être supprimées 😕", "warning");
+          return;
+        }
+
+        const hasAnnotations = annotations.some(anno => anno.category_id === currentCategory);
+        if (hasAnnotations) {
+          showNotification("Impossible de supprimer : catégorie utilisée dans les annotations 😕", "warning");
+          return;
+        }
+
+        showConfirmModal(
+          "Supprimer la catégorie",
+          `Voulez-vous vraiment supprimer la catégorie "${categories[currentCategory].displayName}" ?`,
+          () => {
+            const button = document.getElementById(`cat${currentCategory}`);
+            if (button) {
+              button.remove();
+            }
+            delete categories[currentCategory];
+
+            const availableCategories = Object.keys(categories).map(Number);
+            if (availableCategories.length > 0) {
+              selectCategory(availableCategories[0]);
+            } else {
+              currentCategory = null;
+              showNotification("Aucune catégorie restante 😕", "warning");
+            }
+
+            showNotification(`Catégorie supprimée ! 🫀`);
+            isSaved = false;
+          }
+        );
+      } catch (e) {
+        console.error("Error in deleteCategory:", e);
+        showNotification("Erreur lors de la suppression de la catégorie 😕", "danger");
+      }
+    }
+
+    function checkUnsavedChanges(callback) {
+      if (!isSaved && (annotations.length > 0 || maskPoints.length > 0)) {
+        showConfirmModal(
+          "Modifications non enregistrées",
+          "Vous avez des modifications non enregistrées. Voulez-vous enregistrer avant de continuer ?",
+          () => {
+            saveAll();
+            callback();
+          },
+          () => {
+            callback();
+          }
+        );
+      } else {
+        callback();
+      }
+    }
+
+    function setupEventHandlers() {
+      try {
+        const buttons = {
+          undoBtn: () => {
+            if (!isViewOnly) {
+              undoAnnotation();
+              isSaved = false;
+            } else {
+              showNotification("Annotation désactivée en mode visualisation 😕", "warning");
+            }
+          },
+          redoBtn: () => {
+            if (!isViewOnly) {
+              redoAnnotation();
+              isSaved = false;
+            } else {
+              showNotification("Annotation désactivée en mode visualisation 😕", "warning");
+            }
+          },
+          clearAllBtn: () => {
+            if (!isViewOnly) {
+              showConfirmModal(
+                "Supprimer toutes les annotations",
+                "Voulez-vous vraiment supprimer toutes les annotations ? Cette action est irréversible.",
+                () => {
+                  clearAllAnnotations();
+                  isSaved = false;
+                }
+              );
+            } else {
+              showNotification("Annotation désactivée en mode visualisation 😕", "warning");
+            }
+          },
+          saveBtn: debounce(() => {
+            saveAll();
+            isSaved = true;
+          }, 1000),
+          newImageBtn: () => {
+            if (!isSaved && (annotations.length > 0 || maskPoints.length > 0)) {
+              showImageChangeModal(document.getElementById("imageInput").files[0]);
+            } else {
+              document.getElementById("imageInput").click();
+            }
+          },
+          historyBtn: () => {
+            showHistoryModal();
+          },
+          themeToggleBtn: toggleTheme,
+          deleteCategoryBtn: () => {
+            if (!isViewOnly) {
+              deleteCategory();
+            } else {
+              showNotification("Modification des catégories désactivée en mode visualisation 😕", "warning");
+            }
+          },
+          toggleAnnotationsBtn: toggleAnnotations,
+          backBtn: () => {
+            checkUnsavedChanges(() => window.location.href = 'Home_Screen.html');
+          },
+          tutorialBtn: () => {
+            const tutorialModal = new bootstrap.Modal(document.getElementById("tutorialModal"));
+            tutorialModal.show();
+          }
+        };
+
+        Object.keys(buttons).forEach(id => {
+          const button = document.getElementById(id);
+          if (button) {
+            button.addEventListener("click", () => buttons[id]());
+          }
+        });
+
+        const imageInput = document.getElementById("imageInput");
+        if (imageInput) {
+          imageInput.addEventListener("change", (e) => {
+            if (e.target.files[0]) {
+              if (!isSaved && (annotations.length > 0 || maskPoints.length > 0)) {
+                showImageChangeModal(e.target.files[0]);
+              } else {
+                checkAndLoadImage(e.target.files[0]);
+              }
+            }
+          });
+        }
+
+        const tutorialModalEl = document.getElementById("tutorialModal");
+        if (tutorialModalEl) {
+          tutorialModalEl.addEventListener("hidden.bs.modal", () => {
+            canvas.focus();
+            document.body.style.overflow = "auto";
+            setupCanvasEventListeners();
+          });
+        }
+
+        const addCategoryModalEl = document.getElementById("addCategoryModal");
+        const confirmAddCategoryBtn = document.getElementById("confirmAddCategoryBtn");
+        const categoryNameInput = document.getElementById("categoryNameInput");
+
+        if (addCategoryModalEl) {
+          addCategoryModalEl.addEventListener("shown.bs.modal", () => {
+            categoryNameInput.value = "";
+            categoryNameInput.focus();
+          });
+        }
+
+        if (confirmAddCategoryBtn) {
+          confirmAddCategoryBtn.addEventListener("click", () => {
+            if (!isViewOnly) {
+              const categoryName = categoryNameInput.value.trim();
+              if (categoryName) {
+                addNewCategory(categoryName);
+                bootstrap.Modal.getInstance(addCategoryModalEl).hide();
+              } else {
+                showNotification("Nom de catégorie requis 😕", "warning");
+              }
+            } else {
+              showNotification("Ajout de catégorie désactivé en mode visualisation 😕", "warning");
+              bootstrap.Modal.getInstance(addCategoryModalEl).hide();
+            }
+          });
+        }
+
+        ["dragenter", "dragover", "dragleave", "drop"].forEach((event) => {
+          wrapper.addEventListener(event, (e) => e.preventDefault());
+        });
+        wrapper.addEventListener("drop", (e) => {
+          const files = e.dataTransfer.files;
+          if (files[0]) {
+            if (!isSaved && (annotations.length > 0 || maskPoints.length > 0)) {
+              showImageChangeModal(files[0]);
+            } else {
+              checkAndLoadImage(files[0]);
+            }
+          }
+        });
+
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        tooltipTriggerList.forEach((tooltipTriggerEl) => {
+          new bootstrap.Tooltip(tooltipTriggerEl);
+          tooltipTriggerEl.addEventListener("click", () => {
+            tooltipTriggerEl.classList.add("clicked");
+            setTimeout(() => tooltipTriggerEl.classList.remove("clicked"), 300);
+          });
+        });
+
+        if (!localStorage.getItem("tutorialShown")) {
+          const tutorialModal = new bootstrap.Modal(document.getElementById("tutorialModal"));
+          tutorialModal.show();
+        }
+
+        document.getElementById("dontShowAgain").addEventListener("change", (e) => {
+          if (e.target.checked) {
+            localStorage.setItem("tutorialShown", "true");
+          }
+        });
+
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && maskPoints.length > 0 && !isViewOnly) {
+            cancelAnnotation();
+            isSaved = false;
+          }
+        });
+
+        setupCanvasEventListeners();
+      } catch (e) {
+        console.error("Error in setupEventHandlers:", e);
+        showNotification("Erreur lors de l'initialisation des boutons 😕", "danger");
+      }
+    }
+
+    function cancelAnnotation() {
+      try {
+        if (maskPoints.length > 0) {
+          maskPoints = [];
+          isDrawing = false;
+          redrawCanvas();
+          showNotification("Annotation annulée ! 🫀");
+        }
+      } catch (e) {
+        console.error("Error in cancelAnnotation:", e);
+      }
+    }
+
+    function toggleAnnotations() {
+      try {
+        showAnnotations = !showAnnotations;
+        const toggleBtn = document.getElementById("toggleAnnotationsBtn");
+        toggleBtn.innerHTML = showAnnotations ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+        redrawCanvas();
+        showNotification(showAnnotations ? "Annotations affichées ! 🫀" : "Annotations masquées ! 🫀");
+      } catch (e) {
+        console.error("Error in toggleAnnotations:", e);
+      }
+    }
+
+    function setupCanvasEventListeners() {
+      try {
+        canvas.removeEventListener("touchstart", handleTouchStart);
+        canvas.removeEventListener("touchmove", handleTouchMove);
+        canvas.removeEventListener("touchend", handleTouchEnd);
+        canvas.removeEventListener("mousedown", handleMouseDown);
+        canvas.removeEventListener("mousemove", handleMouseMove);
+        canvas.removeEventListener("mouseup", handleMouseUp);
+        canvas.removeEventListener("contextmenu", handleContextMenu);
+
+        if (!isViewOnly) {
+          canvas.addEventListener("touchstart", handleTouchStart, { passive: false });
+          canvas.addEventListener("touchmove", handleTouchMove, { passive: false });
+          canvas.addEventListener("touchend", handleTouchEnd, { passive: false });
+          canvas.addEventListener("mousedown", handleMouseDown);
+          canvas.addEventListener("mousemove", handleMouseMove);
+          canvas.addEventListener("mouseup", handleMouseUp);
+          canvas.addEventListener("contextmenu", handleContextMenu);
+        }
+      } catch (e) {
+        console.error("Error in setupCanvasEventListeners:", e);
+      }
+    }
+
+    function handleContextMenu(e) {
+      e.preventDefault();
+    }
+
+    function toggleTheme() {
+      try {
+        const html = document.documentElement;
+        const currentTheme = html.getAttribute("data-theme");
+        if (currentTheme === "dark") {
+          html.removeAttribute("data-theme");
+          document.getElementById("themeToggleBtn").innerHTML = '<i class="fas fa-moon"></i>';
+        } else {
+          html.setAttribute("data-theme", "dark");
+          document.getElementById("themeToggleBtn").innerHTML = '<i class="fas fa-sun"></i>';
+        }
+        showNotification("Thème changé ! 🌟");
+      } catch (e) {
+        console.error("Error in toggleTheme:", e);
+        showNotification("Erreur lors du changement de thème 😕", "danger");
+      }
+    }
+
+    function getTransformedPos(clientX, clientY) {
+      try {
+        if (!image) return { x: 0, y: 0, clientX, clientY };
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = image.width / rect.width;
+        const scaleY = image.height / rect.height;
+        const x = (clientX - rect.left) * scaleX;
+        const y = (clientY - rect.top) * scaleY;
+        return { x, y, clientX, clientY };
+      } catch (e) {
+        console.error("Error in getTransformedPos:", e);
+        return { x: 0, y: 0, clientX, clientY };
+      }
+    }
+
+    function handleTouchStart(e) {
+      e.preventDefault();
+      if (!image || isViewOnly) return;
+
+      try {
+        const touch = e.touches[0];
+        const pos = getTransformedPos(touch.clientX, touch.clientY);
+        if (e.touches.length === 1) {
+          isDrawing = true;
+          maskPoints = [pos];
+          showNotification("Annotation commencée ! 🫀");
+          isSaved = false;
+          redrawCanvas();
+        }
+      } catch (e) {
+        console.error("Error in handleTouchStart:", e);
+      }
+    }
+
+    function handleTouchMove(e) {
+      e.preventDefault();
+      if (!image || isViewOnly || !isDrawing) return;
+
+      try {
+        const touch = e.touches[0];
+        const pos = getTransformedPos(touch.clientX, touch.clientY);
+        maskPoints.push(pos);
+        redrawCanvas();
+        drawTemporaryMask();
+      } catch (e) {
+        console.error("Error in handleTouchMove:", e);
+      }
+    }
+
+    function handleTouchEnd(e) {
+      e.preventDefault();
+      if (!image || isViewOnly || !isDrawing) return;
+
+      try {
+        isDrawing = false;
+        finalizeMask();
+      } catch (e) {
+        console.error("Error in handleTouchEnd:", e);
+      }
+    }
+
+    function handleMouseDown(e) {
+      if (!image || isViewOnly || e.button !== 0) return;
+
+      try {
+        const pos = getTransformedPos(e.clientX, e.clientY);
+        isDrawing = true;
+        maskPoints = [pos];
+        showNotification("Annotation commencée ! 🫀");
+        isSaved = false;
+        redrawCanvas();
+      } catch (e) {
+        console.error("Error in handleMouseDown:", e);
+      }
+    }
+
+    function handleMouseMove(e) {
+      if (!image || isViewOnly || !isDrawing) return;
+
+      try {
+        const pos = getTransformedPos(e.clientX, e.clientY);
+        maskPoints.push(pos);
+        redrawCanvas();
+        drawTemporaryMask();
+      } catch (e) {
+        console.error("Error in handleMouseMove:", e);
+      }
+    }
+
+    function handleMouseUp(e) {
+      if (!image || isViewOnly || !isDrawing) return;
+
+      try {
+        isDrawing = false;
+        finalizeMask();
+      } catch (e) {
+        console.error("Error in handleMouseUp:", e);
+      }
+    }
+
+    function initializeCanvas(img) {
+      try {
+        const container = document.querySelector(".canvas-area");
+        const maxWidth = container.clientWidth;
+        const maxHeight = container.clientHeight;
+        const scale = Math.min(maxWidth / img.width, maxHeight / img.height);
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        canvas.style.display = "block";
+        placeholder.style.display = "none";
+        zoomLevel = 1;
+        canvas.style.transform = `scale(${zoomLevel})`;
+        redrawCanvas();
+        isSaved = true;
+      } catch (e) {
+        console.error("Error in initializeCanvas:", e);
+      }
+    }
+
+    function checkAndLoadImage(file) {
+      try {
+        if (image && file.name === image.file_name) {
+          showNotification("Cette image est déjà chargée 😕", "warning");
+          return;
+        }
+        if (sessionAnnotatedImages.includes(file.name)) {
+          isViewOnly = true;
+          showNotification("Image déjà annotée, mode visualisation activé 📷", "info");
+          loadImage(file);
+        } else {
+          isViewOnly = false;
+          loadImage(file);
+        }
+      } catch (e) {
+        console.error("Error in checkAndLoadImage:", e);
+      }
+    }
+
+    function loadImage(file) {
+      try {
+        const progressBar = document.getElementById("progressBar");
+        progressBar.style.width = "30%";
+
+        if (!file.type.startsWith("image/")) {
+          showNotification("Veuillez sélectionner une image valide 😕", "danger");
+          progressBar.style.width = "0%";
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          progressBar.style.width = "60%";
+          const img = new Image();
+          img.src = e.target.result;
+          img.onload = () => {
+            progressBar.style.width = "100%";
+            setTimeout(() => (progressBar.style.width = "0%"), 300);
+
+            annotations.length = 0;
+            maskPoints = [];
+            isDrawing = false;
+
+            image = {
+              file_name: file.name,
+              image: img,
+              id: imageId++,
+              height: img.height,
+              width: img.width,
+            };
+
+            initializeCanvas(img);
+            showAnnotations = true;
+            document.getElementById("toggleAnnotationsBtn").innerHTML = '<i class="fas fa-eye"></i>';
+            showNotification(`Image chargée : ${file.name} 📷`);
+            setupCanvasEventListeners();
+          };
+          img.onerror = () => {
+            showNotification("Erreur de chargement de l'image 😕", "danger");
+            progressBar.style.width = "0%";
+          };
+        };
+        reader.onerror = () => {
+          showNotification("Erreur de lecture du fichier 😕", "danger");
+          progressBar.style.width = "0%";
+        };
+        reader.readAsDataURL(file);
+      } catch (e) {
+        console.error("Error in loadImage:", e);
+      }
+    }
+
+    function redrawCanvas() {
+      try {
+        if (!image) return;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(image.image, 0, 0, canvas.width, canvas.height);
+
+        if (showAnnotations) {
+          const labelRects = [];
+
+          annotations.forEach((anno) => {
+            const category = categories[anno.category_id];
+            const color = category?.color || "rgb(128, 128, 128)";
+            const isCustom = category?.supercategory === "custom";
+            ctx.strokeStyle = color;
+            ctx.fillStyle = isCustom ? hexToRgba(color, 0.2) : color.replace("rgb", "rgba").replace(")", ", 0.3)");
+            ctx.lineWidth = 2;
+
+            const scaleX = canvas.width / image.width;
+            const scaleY = canvas.height / image.height;
+            const scaledMask = anno.mask.map((point) => ({
+              x: point.x * scaleX,
+              y: point.y * scaleY,
+            }));
+
+            drawMask(scaledMask);
+            drawLabel(categories[anno.category_id]?.displayName || "Catégorie supprimée", scaledMask, anno.category_id, labelRects);
+          });
+
+          if (maskPoints.length > 0 && !isViewOnly) {
+            drawTemporaryMask();
+          }
+        }
+      } catch (e) {
+        console.error("Error in redrawCanvas:", e);
+      }
+    }
+
+    function drawLabel(text, maskPoints, categoryId, labelRects) {
+      try {
+        const fontSize = 14;
+        ctx.font = `bold ${fontSize}px Inter`;
+        ctx.textBaseline = "bottom";
+        const metrics = ctx.measureText(text);
+        const padding = 6;
+        const labelWidth = metrics.width + padding * 4;
+        const labelHeight = fontSize + padding * 2;
+        const offset = 10;
+
+        const maskBounds = {
+          minX: Math.min(...maskPoints.map(p => p.x)),
+          maxX: Math.max(...maskPoints.map(p => p.x)),
+          minY: Math.min(...maskPoints.map(p => p.y)),
+          maxY: Math.max(...maskPoints.map(p => p.y)),
+        };
+
+        const startPoint = maskPoints[0];
+
+        const candidates = [
+          { x: startPoint.x - labelWidth / 2, y: startPoint.y - labelHeight - offset },
+          { x: startPoint.x - labelWidth / 2, y: startPoint.y + offset },
+          { x: startPoint.x - labelWidth - offset, y: startPoint.y - labelHeight / 2 },
+          { x: startPoint.x + offset, y: startPoint.y - labelHeight / 2 },
+        ];
+
+        let labelX, labelY;
+        let foundPosition = false;
+
+        for (const candidate of candidates) {
+          const tempX = Math.max(padding, Math.min(candidate.x, canvas.width - labelWidth));
+          const tempY = Math.max(padding, Math.min(candidate.y, canvas.height - labelHeight));
+
+          const labelRect = { x: tempX, y: tempY, width: labelWidth, height: labelHeight };
+
+          const isOverlappingMask = (
+            labelRect.x < maskBounds.maxX &&
+            labelRect.x + labelRect.width > maskBounds.minX &&
+            labelRect.y < maskBounds.maxY &&
+            labelRect.y + labelRect.height > maskBounds.minY
+          );
+
+          const isOverlappingLabel = labelRects.some(existingRect =>
+            labelRect.x < existingRect.x + existingRect.width &&
+            labelRect.x + labelRect.width > existingRect.x &&
+            labelRect.y < existingRect.y + existingRect.height &&
+            labelRect.y + labelRect.height > existingRect.y
+          );
+
+          if (!isOverlappingMask && !isOverlappingLabel) {
+            labelX = tempX;
+            labelY = tempY;
+            foundPosition = true;
+            labelRects.push(labelRect);
+            break;
+          }
+        }
+
+        if (!foundPosition) {
+          labelX = Math.max(padding, Math.min(startPoint.x - labelWidth / 2, canvas.width - labelWidth));
+          labelY = Math.max(padding, startPoint.y - labelHeight - offset);
+          labelRects.push({ x: labelX, y: labelY, width: labelWidth, height: labelHeight });
+        }
+
+        ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+        ctx.fillRect(labelX, labelY, labelWidth, labelHeight);
+        ctx.fillStyle = categories[categoryId]?.color || "white";
+        ctx.fillText(text, labelX + padding * 2, labelY + fontSize + padding);
+      } catch (e) {
+        console.error("Error in drawLabel:", e);
+      }
+    }
+
+    function drawMask(points) {
+      try {
+        ctx.beginPath();
+        points.forEach((point, i) => {
+          i === 0 ? ctx.moveTo(point.x, point.y) : ctx.lineTo(point.x, point.y);
+        });
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+      } catch (e) {
+        console.error("Error in drawMask:", e);
+      }
+    }
+
+    function drawTemporaryMask() {
+      try {
+        if (!maskPoints.length) return;
+
+        const category = categories[currentCategory];
+        const color = category?.color || "rgb(128, 128, 128)";
+        const isCustom = category?.supercategory === "custom";
+        ctx.strokeStyle = color;
+        ctx.fillStyle = isCustom ? hexToRgba(color, 0.2) : color.replace("rgb", "rgba").replace(")", ", 0.3)");
+        ctx.lineWidth = 2;
+
+        const scaleX = canvas.width / image.width;
+        const scaleY = canvas.height / image.height;
+
+        ctx.beginPath();
+        maskPoints.forEach((point, i) => {
+          const x = point.x * scaleX;
+          const y = point.y * scaleY;
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        });
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        const pointSize = 4;
+        ctx.fillStyle = color;
+        maskPoints.forEach((point) => {
+          ctx.beginPath();
+          ctx.arc(point.x * scaleX, point.y * scaleY, pointSize / 2, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        if (maskPoints.length > 0) {
+          ctx.fillStyle = "red";
+          ctx.beginPath();
+          ctx.arc(maskPoints[0].x * scaleX, maskPoints[0].y * scaleY, 6, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      } catch (e) {
+        console.error("Error in drawTemporaryMask:", e);
+      }
+    }
+
+    function finalizeMask() {
+      try {
+        if (maskPoints.length < 3) {
+          showNotification("Minimum 3 points requis 😕", "warning");
+          maskPoints = [];
+          isDrawing = false;
+          redrawCanvas();
+          return;
+        }
+
+        const xs = maskPoints.map((p) => p.x);
+        const ys = maskPoints.map((p) => p.y);
+        const minX = Math.min(...xs);
+        const maxX = Math.max(...xs);
+        const minY = Math.min(...ys);
+        const maxY = Math.max(...ys);
+        const area = calculatePolygonArea(maskPoints);
+
+        annotations.push({
+          id: annotationId++,
+          category_id: currentCategory,
+          image_id: image.id,
+          type: "mask",
+          mask: [...maskPoints],
+          bbox: [minX, minY, maxX - minX, maxY - minY],
+          area,
+        });
+
+        maskPoints = [];
+        isDrawing = false;
+        redrawCanvas();
+        showNotification("Annotation ajoutée ! 🫀");
+        isSaved = false;
+      } catch (e) {
+        console.error("Error in finalizeMask:", e);
+      }
+    }
+
+    function calculatePolygonArea(points) {
+      try {
+        let area = 0;
+        for (let i = 0, n = points.length; i < n; i++) {
+          const j = (i + 1) % n;
+          area += points[i].x * points[j].y;
+          area -= points[j].x * points[i].y;
+        }
+        return Math.abs(area) / 2;
+      } catch (e) {
+        console.error("Error in calculatePolygonArea:", e);
+        return 0;
+      }
+    }
+
+    function undoAnnotation() {
+      try {
+        if (annotations.length === 0) {
+          showNotification("Aucune annotation à annuler 😕", "warning");
+          return;
+        }
+
+        const lastAnnotation = annotations.pop();
+        undoneAnnotations.push(lastAnnotation);
+        redrawCanvas();
+        showNotification("Dernière annotation annulée ! 🫀");
+      } catch (e) {
+        console.error("Error in undoAnnotation:", e);
+      }
+    }
+
+    function redoAnnotation() {
+      try {
+        if (undoneAnnotations.length === 0) {
+          showNotification("Aucune annotation à refaire 😕", "warning");
+          return;
+        }
+
+        const annotation = undoneAnnotations.pop();
+        annotations.push(annotation);
+        redrawCanvas();
+        showNotification("Annotation refaite ! 🫀");
+      } catch (e) {
+        console.error("Error in redoAnnotation:", e);
+      }
+    }
+
+    function clearAllAnnotations() {
+      try {
+        annotations.length = 0;
+        undoneAnnotations.length = 0;
+        maskPoints = [];
+        isDrawing = false;
+        annotationId = 0;
+        redrawCanvas();
+        showNotification("Annotations supprimées 😕");
+      } catch (e) {
+        console.error("Error in clearAllAnnotations:", e);
+      }
+    }
+
+    function selectCategory(category) {
+      try {
+        if (!isViewOnly) {
+          currentCategory = category;
+          document.querySelectorAll(".category-panel button").forEach((btn) => btn.classList.remove("active"));
+          const categoryButton = document.getElementById(`cat${category}`);
+          if (categoryButton) {
+            categoryButton.classList.add("active");
+            showNotification(`Catégorie : ${categories[category].displayName} 🫀`);
+          }
+        } else {
+          showNotification("Sélection de catégorie désactivée en mode visualisation 😕", "warning");
+        }
+      } catch (e) {
+        console.error("Error in selectCategory:", e);
+      }
+    }
+
+    function saveAnnotations() {
+      try {
+        if (!image || !annotations.length) {
+          showNotification("Aucune annotation à enregistrer 😕", "warning");
+          return;
+        }
+
+        const cocoFormat = {
+          info: {
+            description: "Annotations d'Images Chirurgicales",
+            version: "1.0",
+            year: new Date().getFullYear(),
+            date_created: new Date().toISOString().split("T")[0],
+          },
+          images: [
+            {
+              id: image.id,
+              file_name: image.file_name,
+              height: image.height,
+              width: image.width,
+              video_id: 165,
+              frame_id: null,
+              is_det_keyframe: true,
+              is_ds_keyframe: true,
+              ds: [0.6666666666666666, 0, 0.3333333333333333],
+            },
+          ],
+          annotations: annotations.map((anno) => ({
+            id: anno.id,
+            image_id: anno.image_id,
+            category_id: anno.category_id,
+            bbox: anno.bbox,
+            area: anno.area,
+            segmentation: [anno.mask.flatMap((p) => [p.x, p.y])],
+            iscrowd: 0,
+          })),
+          categories: Object.values(categories).map((cat, index) => ({
+            id: index + 1,
+            name: cat.name,
+            supercategory: cat.supercategory,
+            displayName: cat.displayName,
+          })),
+        };
+
+        const jsonString = JSON.stringify(cocoFormat, null, 2);
+        const blob = new Blob([jsonString], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${image.file_name.split(".")[0]}_annotations.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showNotification("Annotations enregistrées en JSON ! 💾");
+      } catch (e) {
+        console.error("Error in saveAnnotations:", e);
+        showNotification("Erreur lors de l'enregistrement des annotations 😕", "danger");
+      }
+    }
+
+    function saveImage() {
+      try {
+        if (!image) {
+          showNotification("Aucune image à enregistrer 😕", "warning");
+          return;
+        }
+
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = image.width;
+        tempCanvas.height = image.height;
+        const tempCtx = tempCanvas.getContext("2d");
+
+        tempCtx.drawImage(image.image, 0, 0, image.width, image.height);
+
+        if (showAnnotations) {
+          annotations.forEach((anno) => {
+            const category = categories[anno.category_id];
+            const color = category?.color || "rgb(128, 128, 128)";
+            const isCustom = category?.supercategory === "custom";
+            tempCtx.strokeStyle = color;
+            tempCtx.fillStyle = isCustom ? hexToRgba(color, 0.2) : color.replace("rgb", "rgba").replace(")", ", 0.3)");
+            tempCtx.lineWidth = 2;
+
+            drawMaskOnCanvas(tempCtx, anno.mask);
+
+            const labelText = categories[anno.category_id]?.displayName || "Catégorie supprimée";
+            drawLabelOnCanvas(tempCtx, labelText, anno.mask, anno.category_id);
+          });
+        }
+
+        const dataURL = tempCanvas.toDataURL("image/jpeg", 0.9);
+        const a = document.createElement("a");
+        a.href = dataURL;
+        a.download = `${image.file_name.split(".")[0]}_annotated.jpg`;
+        a.click();
+        showNotification("Image annotée enregistrée ! 🖼️");
+      } catch (e) {
+        console.error("Error in saveImage:", e);
+        showNotification("Erreur lors de l'enregistrement de l'image 😕", "danger");
+      }
+    }
+
+    function drawMaskOnCanvas(ctx, mask) {
+      try {
+        ctx.beginPath();
+        mask.forEach((point, i) => {
+          i === 0 ? ctx.moveTo(point.x, point.y) : ctx.lineTo(point.x, point.y);
+        });
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+      } catch (e) {
+        console.error("Error in drawMaskOnCanvas:", e);
+      }
+    }
+
+    function drawLabelOnCanvas(ctx, text, maskPoints, categoryId) {
+      try {
+        const fontSize = 14;
+        ctx.font = `bold ${fontSize}px Inter`;
+        ctx.textBaseline = "bottom";
+        const metrics = ctx.measureText(text);
+        const padding = 6;
+        const labelWidth = metrics.width + padding * 4;
+        const labelHeight = fontSize + padding * 2;
+        const offset = 10;
+
+        const startPoint = maskPoints[0];
+
+        let labelX = Math.max(padding, Math.min(startPoint.x - labelWidth / 2, ctx.canvas.width - labelWidth));
+        let labelY = Math.max(padding, startPoint.y - labelHeight - offset);
+
+        ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+        ctx.fillRect(labelX, labelY, labelWidth, labelHeight);
+        ctx.fillStyle = categories[categoryId]?.color || "white";
+        ctx.fillText(text, labelX + padding * 2, labelY + fontSize + padding);
+      } catch (e) {
+        console.error("Error in drawLabelOnCanvas:", e);
+      }
+    }
+
+    function saveAll() {
+      try {
+        if (!image) {
+          showNotification("Aucune image à enregistrer 😕", "warning");
+          return;
+        }
+
+        saveAnnotations();
+        saveImage();
+
+        if (!sessionAnnotatedImages.includes(image.file_name)) {
+          sessionAnnotatedImages.push(image.file_name);
+          localStorage.setItem("lastAnnotatedImage", image.file_name);
+        }
+        isSaved = true;
+      } catch (e) {
+        console.error("Error in saveAll:", e);
+        showNotification("Erreur lors de l'enregistrement 😕", "danger");
+      }
+    }
+
+    function showNotification(message, type = "success") {
+      try {
+        const toast = document.createElement("div");
+        toast.className = `toast align-items-center text-bg-${type} border-0`;
+        toast.role = "alert";
+        toast.ariaLive = "assertive";
+        toast.ariaAtomic = "true";
+        toast.innerHTML = `
+          <div class="d-flex">
+            <div class="toast-body">
+              ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        `;
+        document.body.appendChild(toast);
+        const bootstrapToast = new bootstrap.Toast(toast);
+        bootstrapToast.show();
+        setTimeout(() => toast.remove(), 3000);
+      } catch (e) {
+        console.error("Error in showNotification:", e);
+      }
+    }
+
+    function debounce(func, wait) {
+      let timeout;
+      return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+
+    setupEventHandlers();
+    </script>
+  </body>
+</html>
