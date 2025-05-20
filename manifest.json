@@ -6,7 +6,6 @@
   "display": "standalone",
   "background_color": "#10b981",
   "theme_color": "#10b981",
-  "scope": "/",
   "icons": [
     {
       "src": "https://img.icons8.com/fluency/192/000000/heart-with-pulse.png",
