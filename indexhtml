@@ -330,7 +330,7 @@
 
           setTimeout(() => {
             localStorage.setItem('specialty', btn.dataset.specialty);
-            window.location.href = 'index.html';
+            window.location.href = 'Code_App.html';
           }, 1200);
         }
       });
