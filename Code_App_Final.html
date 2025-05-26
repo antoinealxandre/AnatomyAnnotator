@@ -76,11 +76,11 @@
       background: var(--canvas-bg);
       backdrop-filter: blur(12px);
       border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0, 128, 128, 0.4);
+      box-shadow: 0 8px 32px var(--shadow-cyan);
       padding: 6px;
       margin: 0;
       width: 100%;
-      max-width: min(950px, 92vw);
+      max-width: min(1000px, 95vw);
       position: relative;
       animation: fadeInUp 1.4s ease forwards 0.6s;
       user-select: none;
@@ -114,12 +114,12 @@
 
     .canvas-wrapper:hover {
       transform: scale(1.02);
-      box-shadow: 0 12px 40px rgba(0, 128, 128, 0.6);
+      box-shadow: 0 12px 40px var(--shadow-cyan);
     }
 
     .canvas-area {
       width: 100%;
-      height: clamp(35vh, 65vh, 70vh);
+      height: clamp(40vh, 70vh, 75vh);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -180,7 +180,7 @@
       background: var(--canvas-bg);
       backdrop-filter: blur(12px);
       border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0, 128, 128, 0.4);
+      box-shadow: 0 8px 32px var(--shadow-cyan);
       padding: 1rem;
       width: 100%;
       max-width: min(240px, 75vw);
@@ -195,7 +195,7 @@
 
     .category-panel:hover {
       transform: scale(1.02);
-      box-shadow: 0 12px 40px rgba(0, 128, 128, 0.6);
+      box-shadow: 0 12px 40px var(--shadow-cyan);
     }
 
     .category-panel button {
@@ -255,7 +255,7 @@
       backdrop-filter: blur(12px);
       padding: 4px 6px;
       border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 128, 128, 0.4);
+      box-shadow: 0 4px 12px var(--shadow-cyan);
       flex-wrap: wrap;
     }
 
@@ -267,15 +267,15 @@
 
     .bottom-right-toolbar {
       position: absolute;
-      bottom: 6px;
-      right: 6px;
+      bottom: 20px;
+      right: 20px;
       display: flex;
       gap: 5px;
       background: rgba(20, 40, 55, 0.4);
       backdrop-filter: blur(12px);
       padding: 4px 6px;
       border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 128, 128, 0.4);
+      box-shadow: 0 4px 12px var(--shadow-cyan);
     }
 
     .toolbar button, .bottom-right-toolbar button {
@@ -307,7 +307,7 @@
       font-size: clamp(10px, 2.5vw, 12px);
       padding: 4px 8px;
       border-radius: 4px;
-      box-shadow: 0 4px 8px rgba(0, 128, 128, 0.4);
+      box-shadow: 0 4px 8px var(--shadow-cyan);
       backdrop-filter: blur(12px);
     }
 
@@ -357,7 +357,7 @@
       background: var(--canvas-bg);
       color: var(--accent-color);
       border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 128, 128, 0.4);
+      box-shadow: 0 8px 32px var(--shadow-cyan);
       border: none;
       backdrop-filter: blur(12px);
       transition: transform 0.3s ease, opacity 0.3s ease;
@@ -369,16 +369,8 @@
     }
 
     .modal-content .btn-close {
-      filter: invert(1);
-      background: var(--primary-color);
-      border-radius: 50%;
-      padding: 6px;
-      opacity: 0.8;
-      transition: opacity 0.2s ease;
-    }
-
-    .modal-content .btn-close:hover {
-      opacity: 1;
+      background: transparent;
+      filter: opacity(0.5);
     }
 
     .modal-content .btn-primary {
@@ -398,20 +390,6 @@
 
     .modal-content .form-check-label {
       color: var(--accent-color);
-    }
-
-    .btn-danger {
-      background: #dc2626;
-      border: none;
-      border-radius: 8px;
-      box-shadow: 0 0 8px var(--shadow-cyan);
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-    }
-
-    .btn-danger:hover {
-      background: #b91c1c;
-      transform: scale(1.05);
-      box-shadow: 0 0 12px var(--shadow-cyan);
     }
 
     .modal-header {
@@ -453,6 +431,10 @@
       font-weight: 700;
     }
 
+    #tutorialModal .modal-body strong {
+      color: #ffffff;
+    }
+
     .modal-body p {
       margin: 0.5rem 0;
       color: var(--text-light);
@@ -492,11 +474,11 @@
       }
 
       .canvas-wrapper {
-        max-width: min(750px, 65vw);
+        max-width: min(900px, 75vw);
       }
 
       .canvas-area {
-        height: clamp(45vh, 70vh, 75vh);
+        height: clamp(50vh, 75vh, 80vh);
       }
 
       .category-panel {
@@ -612,17 +594,17 @@
           <p>Charge une image et commence ton aventure anatomique !</p>
         </div>
         <canvas id="canvas" style="display: none"></canvas>
-        <div class="bottom-right-toolbar">
-          <button class="btn" id="undoBtn" data-bs-toggle="tooltip" data-bs-placement="top" title="Annuler">
-            <i class="fas fa-undo"></i>
-          </button>
-          <button class="btn" id="redoBtn" data-bs-toggle="tooltip" data-bs-placement="top" title="Refaire">
-            <i class="fas fa-redo"></i>
-          </button>
-          <button class="btn" id="clearAllBtn" data-bs-toggle="tooltip" data-bs-placement="top" title="Supprimer">
-            <i class="fas fa-trash"></i>
-          </button>
-        </div>
+      </div>
+      <div class="bottom-right-toolbar">
+        <button class="btn" id="undoBtn" data-bs-toggle="tooltip" data-bs-placement="top" title="Annuler">
+          <i class="fas fa-undo"></i>
+        </button>
+        <button class="btn" id="redoBtn" data-bs-toggle="tooltip" data-bs-placement="top" title="Refaire">
+          <i class="fas fa-redo"></i>
+        </button>
+        <button class="btn" id="clearAllBtn" data-bs-toggle="tooltip" data-bs-placement="top" title="Supprimer">
+          <i class="fas fa-trash"></i>
+        </button>
       </div>
     </div>
     <div class="category-panel">
@@ -656,28 +638,24 @@
         <div class="modal-body">
           <div class="d-flex flex-column gap-3">
             <div class="d-flex align-items-start gap-3">
-              <i class="fas fa-download fa-lg" style="color: var(--primary-color); margin-top: 4px;"></i>
               <div>
                 <strong>1. Charger une image 📷</strong>
                 <p>Clique sur "Charger" pour importer ton image anatomique.</p>
               </div>
             </div>
             <div class="d-flex align-items-start gap-3">
-              <i class="fas fa-heart fa-lg" style="color: var(--primary-color); margin-top: 4px;"></i>
               <div>
                 <strong>2. Choisir une catégorie 🫀</strong>
                 <p>Sélectionne une structure anatomique dans le panneau de droite.</p>
               </div>
             </div>
             <div class="d-flex align-items-start gap-3">
-              <i class="fas fa-pen fa-lg" style="color: var(--primary-color); margin-top: 4px;"></i>
               <div>
                 <strong>3. Annoter ✍️</strong>
                 <p>Maintiens le clic ou le toucher pour dessiner un masque. Relâche pour finaliser.</p>
               </div>
             </div>
             <div class="d-flex align-items-start gap-3">
-              <i class="fas fa-save fa-lg" style="color: var(--primary-color); margin-top: 4px;"></i>
               <div>
                 <strong>4. Sauvegarder 💾</strong>
                 <p>Enregistre tes annotations en JSON et JPG pour les partager ou les réutiliser.</p>
@@ -708,7 +686,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-          <button type="button" class="btn btn-danger" id="confirmActionBtn">Confirmer</button>
+          <button type="button" class="btn btn-primary" id="confirmActionBtn">Confirmer</button>
         </div>
       </div>
     </div>
@@ -727,7 +705,7 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
           <button type="button" class="btn btn-primary" id="saveAndChangeBtn">Enregistrer et changer</button>
-          <button type="button" class="btn btn-danger" id="changeWithoutSavingBtn">Changer sans enregistrer</button>
+          <button type="button" class="btn btn-primary" id="changeWithoutSavingBtn">Changer sans enregistrer</button>
         </div>
       </div>
     </div>
