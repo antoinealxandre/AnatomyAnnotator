@@ -2142,54 +2142,87 @@
         }
       }
 
-function saveAll() {
-  try {
-    if (!image) return;
+      function saveAll() {
+        try {
+          if (!image) return;
 
-    const baseFileName = image.file_name.split(".")[0];
-    const outputFileName = `${baseFileName}_annotated`;
+          const outputCanvas = document.createElement("canvas");
+          outputCanvas.width = image.width;
+          outputCanvas.height = image.height;
+          const outputCtx = outputCanvas.getContext("2d");
+          outputCtx.drawImage(image.image, 0, 0, image.width, image.height);
 
-    const imageForJson = {
-      file_name: image.file_name,
-      height: image.height,
-      width: image.width,
-      id: image.id,
-      video_id: image.video_id,
-      frame_id: image.frame_id,
-      is_det_keyframe: image.is_det_keyframe,
-      is_ds_keyframe: image.is_ds_keyframe,
-      ds: image.ds,
-    };
+          const labelRects = [];
+          annotations.forEach((anno) => {
+            const category = categories[anno.category_id];
+            const color = category?.color || "rgb(128, 128, 128)";
+            outputCtx.strokeStyle = color;
+            outputCtx.fillStyle = color
+              .replace("rgb", "rgba")
+              .replace(")", ", 0.2)");
+            outputCtx.lineWidth = 2;
 
-    const jsonData = {
-      images: [imageForJson],
-      annotations: annotations,
-      categories: Object.values(categories).map((cat) => ({
-        id: cat.id,
-        name: cat.name,
-        supercategory: cat.supercategory,
-      })),
-    };
+            const maskPoints = convertSegmentationToPoints(
+              anno.segmentation[0]
+            );
 
-    const jsonStr = JSON.stringify(jsonData, null, 2);
-    const jsonBlob = new Blob([jsonStr], { type: "application/json" });
-    const jsonUrl = URL.createObjectURL(jsonBlob);
-    const jsonLink = document.createElement("a");
-    jsonLink.href = jsonUrl;
-    jsonLink.download = `${outputFileName}.json`;
-    jsonLink.click();
-    URL.revokeObjectURL(jsonUrl);
+            drawMask(maskPoints, outputCtx);
+            drawLabel(
+              categories[anno.category_id]?.displayName ||
+                "Catégorie supprimée",
+              maskPoints,
+              anno.category_id,
+              labelRects,
+              outputCtx
+            );
+          });
 
-    if (!sessionAnnotatedImages.includes(image.file_name)) {
-      sessionAnnotatedImages.push(image.file_name);
-      localStorage.setItem("lastAnnotatedImage", image.file_name);
-    }
+          const baseFileName = image.file_name.split(".")[0];
+          const outputFileName = `${baseFileName}_annotated`;
 
-    isSaved = true;
-  } catch (e) {
-    console.error("Error in saveAll:", e);
-  }
-}
+          const imageForJson = {
+            file_name: image.file_name,
+            height: image.height,
+            width: image.width,
+            id: image.id,
+            video_id: image.video_id,
+            frame_id: image.frame_id,
+            is_det_keyframe: image.is_det_keyframe,
+            is_ds_keyframe: image.is_ds_keyframe,
+            ds: image.ds,
+          };
+
+          const jsonData = {
+            images: [imageForJson],
+            annotations: annotations,
+            categories: Object.values(categories).map((cat) => ({
+              id: cat.id,
+              name: cat.name,
+              supercategory: cat.supercategory,
+            })),
+          };
+
+          const jsonStr = JSON.stringify(jsonData, null, 2);
+          const jsonBlob = new Blob([jsonStr], { type: "application/json" });
+          const jsonUrl = URL.createObjectURL(jsonBlob);
+          const jsonLink = document.createElement("a");
+          jsonLink.href = jsonUrl;
+          jsonLink.download = `${outputFileName}.json`;
+          jsonLink.click();
+          URL.revokeObjectURL(jsonUrl);
+
+          
+
+          if (!sessionAnnotatedImages.includes(image.file_name)) {
+            sessionAnnotatedImages.push(image.file_name);
+            localStorage.setItem("lastAnnotatedImage", image.file_name);
+          }
+
+          isSaved = true;
+        } catch (e) {
+          console.error("Error in saveAll:", e);
+        }
+      }
 
       function debounce(func, wait) {
         let timeout;
