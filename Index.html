@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Anatomy Annotator 🫀</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Anatomy Annotator" />
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: "Inter", sans-serif;
+        background: #0a1a3a;
+        color: #eee;
+        overflow-x: hidden;
+        position: relative;
+      }
+      canvas#background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 0;
+        background: radial-gradient(
+          circle,
+          rgba(10, 26, 58, 0.8),
+          rgba(5, 15, 40, 1)
+        );
+      }
+      body > *:not(canvas) {
+        position: relative;
+        z-index: 2;
+      }
+      header {
+        padding: 2rem 1rem 1rem;
+        text-align: center;
+        animation: fadeInDown 1.4s ease forwards;
+        user-select: none;
+      }
+      header h1 {
+        font-weight: 700;
+        font-size: clamp(2rem, 5vw, 2.8rem);
+        letter-spacing: 0.04em;
+        margin-bottom: 0.2rem;
+        text-shadow: 0 0 10px rgba(38, 166, 154, 0.8);
+      }
+      header p {
+        font-size: clamp(1rem, 3vw, 1.2rem);
+        max-width: 720px;
+        margin: auto;
+        color: #b0bec5dd;
+        text-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+      }
+      .select-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* centre les boutons horizontalement */
+        justify-content: center;
+        margin: 2rem auto; /* centre horizontalement, ajoute espace vertical */
+        width: fit-content; /* adapte la largeur au contenu */
+        backdrop-filter: blur(12px);
+        background: rgba(20, 40, 55, 0.4);
+        border-radius: 18px;
+        box-shadow: 0 8px 32px rgba(0, 128, 128, 0.4);
+        padding: 2rem 1.5rem;
+        gap: 1.8rem;
+        animation: fadeInUp 1.4s ease forwards 0.6s;
+        user-select: none;
+      }
+      .specialty-btn {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: clamp(0.8rem, 2vw, 1.1rem) clamp(1.2rem, 2vw, 1.6rem);
+        border-radius: 9999px;
+        font-weight: 600;
+        font-size: clamp(0.9rem, 3vw, 1.25rem);
+        color: #e0f2f1;
+        cursor: pointer;
+        border: none;
+        background: linear-gradient(145deg, #00897b, #004d40);
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.3),
+          inset 0 2px 6px rgba(255, 255, 255, 0.15);
+        transition: transform 0.25s ease, box-shadow 0.25s ease,
+          background 0.4s ease;
+        user-select: none;
+      }
+      .specialty-btn svg {
+        width: clamp(20px, 5vw, 28px);
+        height: clamp(20px, 5vw, 28px);
+        fill: #4db6ac;
+        transition: fill 0.3s ease;
+      }
+      .specialty-btn:hover:not(:disabled),
+      .specialty-btn:focus-visible:not(:disabled) {
+        background: linear-gradient(145deg, #26a69a, #00bcd4);
+        box-shadow: 0 0 18px rgba(0, 255, 255, 0.6),
+          inset 0 4px 12px rgba(255, 255, 255, 0.25);
+        transform: scale(1.05);
+        outline: none;
+      }
+      .specialty-btn:hover svg,
+      .specialty-btn:focus-visible svg {
+        fill: #a7ffeb;
+      }
+      .specialty-btn:disabled {
+        cursor: not-allowed;
+        color: #78909c;
+        background: rgba(30, 70, 90, 0.4);
+        box-shadow: none;
+        transform: none;
+        filter: grayscale(60%);
+      }
+      .locked-vibrate {
+        animation: vibrate 0.3s linear 1;
+        box-shadow: 0 0 20px #ff5252, inset 0 0 15px #ff1744;
+      }
+      footer {
+        text-align: center;
+        font-size: clamp(0.8rem, 2vw, 0.9rem);
+        color: #90a4ae;
+        padding: 2rem 1rem;
+        user-select: none;
+        z-index: 5;
+      }
+      @keyframes fadeInUp {
+        0% {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes fadeInDown {
+        0% {
+          opacity: 0;
+          transform: translateY(-30px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes vibrate {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        20%,
+        60% {
+          transform: translateX(-3px);
+        }
+        40%,
+        80% {
+          transform: translateX(3px);
+        }
+      }
+      #loader {
+        position: fixed;
+        inset: 0;
+        background: #004d40dd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+        z-index: 99;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.4s ease;
+      }
+      #loader.active {
+        opacity: 1;
+        pointer-events: all;
+      }
+      #loader .spinner {
+        border: 4px solid #004d40;
+        border-top: 4px solid #26a69a;
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        animation: spin 1s linear infinite;
+        box-shadow: 0 0 12px #26a69a;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @media (max-width: 480px) {
+        .select-section {
+          padding: 1.5rem 1rem;
+          gap: 1.2rem;
+        }
+      }
+      @media (min-width: 768px) {
+        .select-section {
+          max-width: 500px;
+        }
+        .specialty-btn {
+          padding: 1.2rem 2rem;
+          font-size: 1.35rem;
+        }
+        .specialty-btn svg {
+          width: 32px;
+          height: 32px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="background"></canvas>
+    <header>
+      <h1>Anatomy Annotator 🫀</h1>
+      <p>
+        Plateforme d'annotations chirurgicales. Sélectionnez votre spécialité
+        pour débuter une annotation précise.
+      </p>
+    </header>
+    <section
+      class="select-section"
+      role="main"
+      aria-label="Sélection de la spécialité chirurgicale"
+    >
+      <button
+        class="specialty-btn"
+        data-specialty="digestive"
+        aria-label="Chirurgie digestive - disponible"
+      >
+        Chirurgie digestive
+      </button>
+      <button
+        class="specialty-btn"
+        disabled
+        aria-label="Chirurgie cardiaque - bientôt disponible"
+      >
+        Chirurgie cardiaque
+      </button>
+      <button
+        class="specialty-btn"
+        disabled
+        aria-label="Chirurgie vasculaire - bientôt disponible"
+      >
+        Chirurgie vasculaire
+      </button>
+      <button
+        class="specialty-btn"
+        disabled
+        aria-label="Chirurgie thoracique - bientôt disponible"
+      >
+        Chirurgie thoracique
+      </button>
+    </section>
+    <footer>© 2025 Anatomy Annotator – Tous droits réservés.</footer>
+    <div id="loader" role="alert" aria-live="assertive" aria-label="Chargement">
+      <div class="spinner"></div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // PWA Service Worker
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .then((registration) =>
+              console.log("Service Worker registered:", registration.scope)
+            )
+            .catch((error) =>
+              console.error("Service Worker registration failed:", error)
+            );
+        });
+      }
+
+      // Audio feedback
+      const clickAudio = new Audio(
+        "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAABCxAgAEABAAZGF0YQAAAAA="
+      );
+
+      // Button logic
+      document.querySelectorAll(".specialty-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          if (btn.disabled) {
+            btn.classList.add("locked-vibrate");
+            setTimeout(() => btn.classList.remove("locked-vibrate"), 300);
+          } else {
+            clickAudio.currentTime = 0;
+            clickAudio.play().catch(() => {});
+            const loader = document.getElementById("loader");
+            loader.classList.add("active");
+            setTimeout(() => {
+              localStorage.setItem("specialty", btn.dataset.specialty);
+              window.location.href = "Code_App_Final.html"; // Renvoyer vers le code principal de l'app
+            }, 1200);
+          }
+        });
+      });
+
+      // Simplified canvas particle background
+      const canvas = document.getElementById("background");
+      const ctx = canvas.getContext("2d");
+      let w,
+        h,
+        particles = [];
+
+      function randomRange(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      function initCanvas() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+        particles = [];
+        const particleCount = Math.min(50, Math.floor((w * h) / 20000)); // Reduced particle count
+        for (let i = 0; i < particleCount; i++) {
+          particles.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            vx: randomRange(-0.5, 0.5), // Slower movement
+            vy: randomRange(-0.5, 0.5),
+            r: randomRange(1, 2.5),
+            opacity: randomRange(0.3, 0.7),
+          });
+        }
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+        particles.forEach((p) => {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(38,166,154,${p.opacity})`;
+          ctx.fill();
+
+          // Update position
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0 || p.x > w) p.vx *= -1;
+          if (p.y < 0 || p.y > h) p.vy *= -1;
+        });
+        requestAnimationFrame(draw);
+      }
+
+      window.addEventListener("resize", initCanvas);
+      initCanvas();
+      draw();
+    </script>
+  </body>
+</html>
