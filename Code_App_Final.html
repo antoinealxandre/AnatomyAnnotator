@@ -2146,40 +2146,8 @@
         try {
           if (!image) return;
 
-          const outputCanvas = document.createElement("canvas");
-          outputCanvas.width = image.width;
-          outputCanvas.height = image.height;
-          const outputCtx = outputCanvas.getContext("2d");
-          outputCtx.drawImage(image.image, 0, 0, image.width, image.height);
-
-          const labelRects = [];
-          annotations.forEach((anno) => {
-            const category = categories[anno.category_id];
-            const color = category?.color || "rgb(128, 128, 128)";
-            outputCtx.strokeStyle = color;
-            outputCtx.fillStyle = color
-              .replace("rgb", "rgba")
-              .replace(")", ", 0.2)");
-            outputCtx.lineWidth = 2;
-
-            const maskPoints = convertSegmentationToPoints(
-              anno.segmentation[0]
-            );
-
-            drawMask(maskPoints, outputCtx);
-            drawLabel(
-              categories[anno.category_id]?.displayName ||
-                "Catégorie supprimée",
-              maskPoints,
-              anno.category_id,
-              labelRects,
-              outputCtx
-            );
-          });
-
-          const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
           const baseFileName = image.file_name.split(".")[0];
-          const outputFileName = `${baseFileName}_annotated_${timestamp}`;
+          const outputFileName = `${baseFileName}_annotated`;
 
           const imageForJson = {
             file_name: image.file_name,
@@ -2212,19 +2180,6 @@
           jsonLink.click();
           URL.revokeObjectURL(jsonUrl);
 
-          // 3. Correction du format de sortie en PNG
-          outputCanvas.toBlob(
-            (blob) => {
-              const url = URL.createObjectURL(blob);
-              const link = document.createElement("a");
-              link.href = url;
-              link.download = `${outputFileName}.png`; // Extension corrigée
-              link.click();
-              URL.revokeObjectURL(url);
-            },
-            "image/png" // Type MIME corrigé
-          );
-
           if (!sessionAnnotatedImages.includes(image.file_name)) {
             sessionAnnotatedImages.push(image.file_name);
             localStorage.setItem("lastAnnotatedImage", image.file_name);
@@ -2234,18 +2189,6 @@
         } catch (e) {
           console.error("Error in saveAll:", e);
         }
-      }
-
-      function debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-          const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-          };
-          clearTimeout(timeout);
-          timeout = setTimeout(later, wait);
-        };
       }
 
       function handleResize() {
@@ -2273,11 +2216,8 @@
         }
       }
 
-      
       window.addEventListener("resize", debounce(handleResize, 200));
       setupEventHandlers();
-
-
     </script>
   </body>
 </html>
