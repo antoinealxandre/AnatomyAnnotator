@@ -2273,8 +2273,31 @@
         }
       }
 
+
+
+
+      function lockOrientation() {
+        // Vérifie si l'API Screen Orientation est disponible
+        if (screen.orientation && typeof screen.orientation.lock === 'function') {
+          screen.orientation.lock('landscape').catch(err => {
+            // L'erreur est souvent due au fait que l'API ne peut être appelée 
+            // qu'en plein écran sur certains navigateurs. C'est une dégradation gracieuse.
+            console.log("Verrouillage de l'orientation non autorisé : ", err);
+          });
+        } else {
+          console.log("L'API de verrouillage de l'orientation n'est pas supportée sur ce navigateur.");
+        }
+      }
+
+      // Tente de verrouiller l'orientation dès que la page est chargée
+      window.addEventListener('load', lockOrientation);
+
+
+      
       window.addEventListener("resize", debounce(handleResize, 200));
       setupEventHandlers();
+
+
     </script>
   </body>
 </html>
