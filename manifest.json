@@ -4,6 +4,7 @@
   "description": "Une application pour annoter des images anatomiques avec des masques et des catégories personnalisées.",
   "start_url": "index.html",
   "display": "standalone",
+  "orientation": "landscape",
   "background_color": "#10b981",
   "theme_color": "#10b981",
   "icons": [
