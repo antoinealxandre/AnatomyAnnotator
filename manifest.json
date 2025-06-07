@@ -1,10 +1,9 @@
 {
   "name": "Anatomy Annotator",
-  "short_name": "Anatomy App",
+  "short_name": "Anatomy Annotator",
   "description": "Une application pour annoter des images anatomiques avec des masques et des catégories personnalisées.",
   "start_url": "index.html",
   "display": "standalone",
-  "orientation": "landscape",
   "background_color": "#10b981",
   "theme_color": "#10b981",
   "icons": [
@@ -27,5 +26,5 @@
   ],
   "lang": "fr",
   "dir": "ltr",
-  "orientation": "portrait"
+  "orientation": "landscape"
 }
