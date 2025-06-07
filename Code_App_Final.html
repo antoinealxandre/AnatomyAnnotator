@@ -2019,10 +2019,14 @@
 
           const segmentation = polygonToCocoFormat(maskPoints);
 
+          if (!image.annotationIndex) {
+            image.annotationIndex = 0;
+          }
+
           annotations.push({
-            id: annotationId++,
+            id: image.id * 10 + image.annotationIndex++,
             image_id: image.id,
-            category_id: currentCategory,
+            category_id: categories[currentCategory].id,
             bbox: [minX, minY, maxX - minX, maxY - minY],
             area: area,
             segmentation: segmentation,
