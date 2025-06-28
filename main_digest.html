@@ -26,735 +26,545 @@
     />
     <title>Anatomy Annotator 🫀</title>
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
-      crossorigin="anonymous"
-    />
-    <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
       rel="stylesheet"
-      integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
       crossorigin="anonymous"
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="manifest" href="/manifest.json" />
     <style>
       :root {
-        --primary-color: #00897b;
-        --secondary-color: #004d40;
-        --accent-color: #e0f2f1;
-        --bg-dark: #0a1a3a;
-        --text-light: #b0bec5dd;
-        --text-dark: #eee;
-        --canvas-bg: rgba(20, 40, 55, 0.4);
-        --shadow-cyan: rgba(0, 255, 255, 0.3);
-        --glow-green: rgba(38, 166, 154, 0.6);
-        --button-gradient: linear-gradient(145deg, #00897b, #004d40);
-        --button-hover-gradient: linear-gradient(145deg, #26a69a, #00bcd4);
+        --color-background: #000000;
+        --color-text: #eaeaea;
+        --color-text-muted: #a0a0a0;
+        --gradient-primary: linear-gradient(135deg, #ff7d12, #fb3aa2, #2997ff);
+        --glow-color: rgba(251, 58, 162, 0.3);
+        --border-color-hover: #fb3aa2;
+        --glass-bg: rgba(15, 15, 20, 0.5);
+        --glass-blur: blur(12px);
+        --border-color: rgba(255, 255, 255, 0.1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       }
 
       html,
       body {
-        margin: 0;
-        padding: 0;
         height: 100vh;
-        font-family: "Inter", sans-serif;
-        background: var(--bg-dark);
-        color: var(--text-dark);
+        width: 100vw;
         overflow: hidden;
-        position: fixed;
-        width: 100%;
-        touch-action: manipulation;
+        font-family: "Inter", sans-serif;
+        background-color: var(--color-background);
+        color: var(--color-text);
         -webkit-tap-highlight-color: transparent;
       }
 
-      canvas#background {
+      #constellation-canvas {
         position: fixed;
         top: 0;
         left: 0;
-        width: 100vw;
-        height: 100vh;
-        z-index: 0;
-        background: radial-gradient(
-          circle,
-          rgba(10, 26, 58, 0.8),
-          rgba(5, 15, 40, 1)
-        );
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        opacity: 0.6;
       }
 
-      body > *:not(canvas#background) {
-        position: relative;
-        z-index: 2;
+      .top-header {
+        position: fixed;
+        top: 15px;
+        left: 20px;
+        z-index: 10;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+
+      .top-header .brand {
+        font-weight: 400;
+        color: var(--color-text-muted);
+      }
+
+      /* Style for the app title with gradient */
+      .top-header .app-title {
+          background-image: var(--gradient-primary);
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent; /* Makes the text transparent so the background shows */
+          display: inline-block; /* Necessary for background-clip to work */
+          font-weight: 600; /* Keeps the boldness */
       }
 
       .main-container {
-        position: fixed;
-        top: 10px;
-        left: 0;
-        right: 0;
-        overflow: hidden;
         display: flex;
-        flex-direction: column;
+        gap: 1.5rem;
+        padding: 60px 1.5rem 1.5rem;
+        height: 100%;
+        width: 100%;
         align-items: flex-start;
         justify-content: center;
-        gap: 16px;
-        box-sizing: border-box;
+      }
+
+      .canvas-column {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        height: 100%;
+        max-width: 1200px;
+      }
+
+      .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.6rem;
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+      }
+
+      .toolbar-group {
+        display: flex;
+        gap: 0.6rem;
+      }
+
+      .toolbar-btn {
+        width: 42px; /* Increased size for touch */
+        height: 42px; /* Increased size for touch */
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-color);
+        color: var(--color-text-muted);
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .toolbar-btn:hover {
+        color: var(--color-text);
+        border-color: var(--border-color-hover);
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px var(--glow-color);
+      }
+      .toolbar-btn.active {
+        background-image: var(--gradient-primary);
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 0 15px var(--glow-color);
+      }
+      /* Tooltip style */
+      .toolbar-btn::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #1a1a1a;
+        color: #fff;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s, visibility 0.2s;
+        z-index: 20;
+      }
+      .toolbar-btn:hover::after {
+        opacity: 1;
+        visibility: visible;
       }
 
       .canvas-wrapper {
-        background: var(--canvas-bg);
-        backdrop-filter: blur(12px);
-        border-radius: 12px;
-        box-shadow: 0 8px 32px var(--shadow-cyan);
-        padding: 6px;
-        margin: 0;
-        width: 100%;
-        max-width: min(1000px, 95vw);
+        flex-grow: 1;
         position: relative;
-        animation: fadeInUp 1.4s ease forwards 0.6s;
-        user-select: none;
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
-        overflow: hidden;
-      }
-
-      .canvas-wrapper::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 4px;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          var(--glow-green),
-          transparent
-        );
-        animation: glowPulse 2s ease-in-out infinite;
-        z-index: 3;
-      }
-
-      .canvas-wrapper::after {
-        content: "";
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 4px;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          var(--glow-green),
-          transparent
-        );
-        animation: glowPulseReverse 2s ease-in-out infinite;
-        z-index: 3;
-      }
-
-      .canvas-wrapper:hover {
-        transform: scale(1.02);
-        box-shadow: 0 12px 40px var(--shadow-cyan);
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 0.75rem;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
       }
 
       .canvas-area {
-        width: 100%;
-        height: clamp(40vh, 70vh, 75vh);
-        display: flex;
-        justify-content: center;
-        align-items: center;
         position: relative;
-        overflow: hidden;
+        width: 100%;
+        height: 100%;
         border-radius: 8px;
+        overflow: hidden;
       }
 
       #canvas {
         width: 100%;
         height: 100%;
         object-fit: contain;
-        border-radius: 8px;
-        border: 2px solid var(--primary-color);
         cursor: crosshair;
+        display: none;
         touch-action: none;
       }
 
-      .no-image-placeholder {
+      #noImagePlaceholder {
         width: 100%;
         height: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        color: var(--text-light);
-        text-align: center;
-        background: rgba(30, 50, 65, 0.4);
+        color: var(--color-text-muted);
         border-radius: 8px;
-        text-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+      }
+      #noImagePlaceholder h5 {
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: var(--color-text);
+        margin-bottom: 0.5rem;
       }
 
-      .no-image-placeholder img {
-        width: clamp(50px, 12vw, 60px);
-        height: clamp(50px, 12vw, 60px);
-        margin-bottom: 8px;
-        transition: transform 0.3s ease;
-      }
-
-      .no-image-placeholder img:hover {
-        transform: scale(1.1);
-      }
-
-      .no-image-placeholder h5 {
-        font-size: clamp(15px, 3.2vw, 17px);
-        font-weight: 600;
-        margin-bottom: 5px;
-        color: var(--accent-color);
-      }
-
-      .no-image-placeholder p {
-        font-size: clamp(11px, 2.8vw, 13px);
-        max-width: 90%;
-        color: var(--text-light);
+      .bottom-toolbar {
+        position: absolute;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        z-index: 5;
       }
 
       .category-panel {
-        background: var(--canvas-bg);
-        backdrop-filter: blur(12px);
-        border-radius: 12px;
-        box-shadow: 0 8px 32px var(--shadow-cyan);
-        padding: 1rem;
-        width: 100%;
-        max-width: min(240px, 75vw);
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
-        animation: fadeInUp 1.4s ease forwards 0.8s;
-        user-select: none;
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
-        overflow: hidden;
-      }
-
-      .category-panel:hover {
-        transform: scale(1.02);
-        box-shadow: 0 12px 40px var(--shadow-cyan);
-      }
-
-      .category-panel button {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.35rem 0.5rem;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: clamp(0.65rem, 1.5vw, 0.8rem);
-        color: var(--accent-color);
-        cursor: pointer;
-        border: none;
-        box-shadow: 0 0 8px var(--shadow-cyan),
-          inset 0 1px 4px rgba(255, 255, 255, 0.15);
-        transition: transform 0.25s ease, box-shadow 0.25s ease,
-          filter 0.4s ease, background 0.2s ease;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: 100%;
-        min-height: 28px;
-      }
-
-      #cat3 {
-        background: rgb(22, 163, 74);
-      }
-      #cat4 {
-        background: rgb(37, 99, 235);
-      }
-      #cat5 {
-        background: rgb(217, 119, 6);
-      }
-      #cat7 {
-        background: rgb(148, 0, 211);
-      }
-      #cat6 {
-        background: rgb(185, 28, 28);
-      }
-
-      .category-panel button:hover:not(.disabled),
-      .category-panel button:focus-visible:not(.disabled) {
-        filter: brightness(1.2);
-        box-shadow: 0 0 12px var(--shadow-cyan),
-          inset 0 2px 8px rgba(255, 255, 255, 0.25);
-        transform: scale(1.05);
-      }
-
-      .category-panel button.active {
-        filter: brightness(1.3);
-        box-shadow: 0 0 16px var(--shadow-cyan),
-          inset 0 2px 8px rgba(255, 255, 255, 0.3);
-        transform: scale(1.06);
-        border: 2px solid var(--accent-color);
-      }
-
-      .category-panel button i {
-        font-size: clamp(10px, 1.6vw, 12px);
-        color: #ffffff;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        width: 260px;
         flex-shrink: 0;
       }
 
-      .toolbar {
-        width: 100%;
-        margin-bottom: 6px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 5px;
-        background: rgba(20, 40, 55, 0.4);
-        backdrop-filter: blur(12px);
-        padding: 4px 6px;
-        border-radius: 16px;
-        box-shadow: 0 4px 12px var(--shadow-cyan);
-        flex-wrap: wrap;
-      }
-
-      .left-buttons,
-      .right-buttons {
-        display: flex;
-        gap: 5px;
-        flex-wrap: wrap;
-      }
-
-      .bottom-right-toolbar {
-        position: absolute;
-        bottom: 20px;
-        right: 20px;
-        display: flex;
-        gap: 5px;
-        background: rgba(20, 40, 55, 0.4);
-        backdrop-filter: blur(12px);
-        padding: 4px 6px;
-        border-radius: 16px;
-        box-shadow: 0 4px 12px var(--shadow-cyan);
-      }
-
-      .toolbar button,
-      .bottom-right-toolbar button {
-        width: clamp(30px, 7vw, 34px);
-        height: clamp(30px, 7vw, 34px);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: clamp(15px, 3.2vw, 17px);
-        background: var(--button-gradient);
-        color: var(--accent-color);
-        border: none;
-        box-shadow: 0 0 8px var(--shadow-cyan),
-          inset 0 1px 4px rgba(255, 255, 255, 0.15);
-        transition: transform 0.25s ease, box-shadow 0.25s ease,
-          background 0.4s ease;
-        cursor: pointer;
-      }
-
-      .toolbar button:hover,
-      .bottom-right-toolbar button:hover {
-        background: var(--button-hover-gradient);
-        box-shadow: 0 0 12px var(--shadow-cyan);
-        transform: scale(1.1);
-      }
-
-      .tooltip-inner {
-        background: var(--canvas-bg);
-        color: var(--accent-color);
+      .category-btn {
         font-family: "Inter", sans-serif;
-        font-size: clamp(10px, 2.5vw, 12px);
-        padding: 4px 8px;
-        border-radius: 4px;
-        box-shadow: 0 4px 8px var(--shadow-cyan);
-        backdrop-filter: blur(12px);
+        font-weight: 500;
+        font-size: 0.9rem;
+        text-align: left;
+        color: var(--color-text);
+        padding: 0.8rem 1.2rem; /* Increased padding */
+        border-radius: 10px;
+        background-color: rgba(255, 255, 255, 0.05); /* Default neutral background */
+        background-image: none; /* Ensure no gradient by default */
+        border: 1px solid var(--border-color);
+        cursor: pointer;
+        transition: all 0.2s ease;
       }
 
-      .progress-container {
+      /* Hover state for category buttons - subtle brightness and border */
+      .category-btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.2);
+        border-color: rgba(255, 255, 255, 0.2); /* Slightly more prominent border on hover */
+      }
+
+      /* Active state for category buttons - specific color with a slight gradient */
+      .category-btn.active {
+        color: white; /* Active text color */
+        border-color: transparent; /* No border when active */
+        box-shadow: 0 0 15px var(--glow-color); /* Glow effect when active */
+        transform: translateY(0); /* No transform when active */
+        filter: none; /* Remove brightness filter when active */
+      }
+
+      /* Specific solid colors and gradients for each category when active */
+      #cat3.active { background-image: linear-gradient(135deg, rgb(22, 163, 74), rgb(18, 130, 59)); }
+      #cat4.active { background-image: linear-gradient(135deg, rgb(37, 99, 235), rgb(30, 80, 190)); }
+      #cat5.active { background-image: linear-gradient(135deg, rgb(217, 119, 6), rgb(173, 95, 5)); }
+      #cat7.active { background-image: linear-gradient(135deg, rgb(148, 0, 211), rgb(118, 0, 168)); }
+      #cat6.active { background-image: linear-gradient(135deg, rgb(185, 28, 28), rgb(148, 22, 22)); }
+      #cat8.active { background-image: linear-gradient(135deg, rgb(246, 190, 0), rgb(197, 152, 0)); }
+
+
+      /* Modals */
+      .modal-overlay {
         position: fixed;
         inset: 0;
-        background: #004d40dd;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(5px);
+        z-index: 1000; /* Increased z-index */
         display: flex;
         align-items: center;
         justify-content: center;
-        backdrop-filter: blur(4px);
-        z-index: 99;
         opacity: 0;
         pointer-events: none;
-        transition: opacity 0.4s ease;
+        transition: opacity 0.3s ease;
       }
-
-      .progress-container.active {
+      .modal-overlay.active {
         opacity: 1;
         pointer-events: all;
       }
-
-      .progress-bar {
-        border: 3px solid #004d40;
-        border-top: 3px solid #26a69a;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-        box-shadow: 0 0 10px #26a69a;
-      }
-
-      .modal {
-        z-index: 1050;
-      }
-
-      .modal-backdrop {
-        z-index: 1040;
-        position: fixed;
-      }
-
-      .modal-open {
-        padding-right: 0 !important;
-      }
-
       .modal-content {
-        background: var(--canvas-bg);
-        color: var(--accent-color);
+        background: var(--glass-bg);
+        border: 1px solid var(--border-color);
         border-radius: 16px;
-        box-shadow: 0 8px 32px var(--shadow-cyan);
-        border: none;
-        backdrop-filter: blur(12px);
-        transition: transform 0.3s ease, opacity 0.3s ease;
-        animation: modalPop 0.4s ease forwards;
-      }
-
-      .modal-content:hover {
-        transform: scale(1.02);
-      }
-
-      .modal-content .btn-close {
-        background: transparent;
-        filter: opacity(0.5);
-      }
-
-      .modal-content .btn-primary {
-        background: var(--button-gradient);
-        color: var(--accent-color);
-        border: none;
-        border-radius: 8px;
-        box-shadow: 0 0 8px var(--shadow-cyan);
-        transition: transform 0.25s ease, box-shadow 0.25s ease,
-          background 0.4s ease;
-      }
-
-      .modal-content .btn-primary:hover {
-        background: var(--button-hover-gradient);
-        transform: scale(1.05);
-        box-shadow: 0 0 12px var(--shadow-cyan);
-      }
-
-      .modal-content .form-check-label {
-        color: var(--accent-color);
-      }
-
-      .modal-header {
-        border-bottom: none;
-        padding: 1rem 1.5rem;
-        background: var(--button-gradient);
-        color: var(--accent-color);
-        border-top-left-radius: 16px;
-        border-top-right-radius: 16px;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .modal-header::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: radial-gradient(
-          circle at top,
-          rgba(38, 166, 154, 0.3),
-          transparent
-        );
-        opacity: 0.5;
-      }
-
-      .modal-footer {
-        border-top: none;
-        padding: 0.8rem 1.5rem;
-        justify-content: space-between;
-        background: linear-gradient(180deg, transparent, rgba(20, 40, 55, 0.2));
-      }
-
-      .modal-body {
         padding: 1.5rem;
+        width: 90%;
+        max-width: 500px;
+        transform: scale(0.95);
+        transition: transform 0.3s ease;
+        color: var(--color-text); /* Ensure text color is consistent */
+      }
+      .modal-overlay.active .modal-content {
+        transform: scale(1);
+      }
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+      .modal-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+      }
+      .btn-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: var(--color-text-muted);
+        cursor: pointer;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+      }
+      .btn-close:hover {
+        opacity: 1;
+      }
+      .modal-body {
+        margin-bottom: 1.5rem;
+        color: var(--color-text-muted);
         line-height: 1.6;
       }
-
       .modal-body strong {
-        color: var(--primary-color);
-        font-weight: 700;
+        color: var(--color-text); /* Highlight strong text in modals */
+      }
+      .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
       }
 
-      #tutorialModal .modal-body strong {
-        color: #ffffff;
+      .btn {
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        font-weight: 500;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .btn-primary {
+        background-image: var(--gradient-primary);
+        color: white;
+        border: none;
+      }
+      .btn-primary:hover {
+        filter: brightness(1.2);
+        box-shadow: 0 0 15px var(--glow-color);
+      }
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: var(--color-text);
+      }
+      .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.15);
       }
 
-      .modal-body p {
-        margin: 0.5rem 0;
-        color: var(--text-light);
+      /* Progress Indicator */
+      .progress-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        z-index: 1001;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+      .progress-overlay.active {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .progress-spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid var(--border-color-hover);
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
       }
 
-      .modal-title {
-        font-size: 1.3rem;
-        font-weight: 700;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-      }
-
-      @keyframes glowPulse {
-        0%,
-        100% {
-          opacity: 0.6;
-          transform: translateX(-10%);
-        }
-        50% {
-          opacity: 1;
-          transform: translateX(10%);
-        }
-      }
-
-      @keyframes glowPulseReverse {
-        0%,
-        100% {
-          opacity: 0.6;
-          transform: translateX(10%);
-        }
-        50% {
-          opacity: 1;
-          transform: translateX(-10%);
-        }
-      }
-
-      @keyframes modalPop {
-        0% {
-          transform: scale(0.8);
-          opacity: 0;
-        }
-        100% {
-          transform: scale(1);
-          opacity: 1;
-        }
-      }
-
-      @media (min-width: 768px) {
+      /* Responsive */
+      @media (max-width: 1024px) {
         .main-container {
-          flex-direction: row;
-          justify-content: center;
-          align-items: flex-start;
-          gap: 20px;
-          position: fixed;
-          top: 10px;
-          left: 0;
-          right: 0;
+          flex-direction: column;
+          padding: 60px 1rem 1rem;
         }
-
-        .canvas-wrapper {
-          max-width: min(900px, 75vw);
-        }
-
-        .canvas-area {
-          height: clamp(50vh, 75vh, 80vh);
-        }
-
         .category-panel {
-          max-width: min(240px, 18vw);
-          padding: 1.2rem;
+          width: 100%;
+          flex-direction: row;
+          flex-wrap: wrap;
+          max-height: 25vh;
+          overflow-y: auto;
+        }
+        .category-btn {
+          flex-grow: 1;
+          text-align: center;
+        }
+        .bottom-toolbar {
+          flex-direction: row;
+          bottom: 1rem;
+          right: 1rem;
+        }
+      }
+      @media (max-width: 768px) {
+        .top-header {
+          font-size: 0.8rem;
+          top: 10px;
+          left: 10px;
+        }
+        .main-container {
+          padding: 50px 0.5rem 0.5rem;
+          gap: 1rem;
+        }
+        .toolbar {
+          padding: 0.4rem;
+        }
+        .toolbar-btn {
+          width: 36px;
+          height: 36px;
+          font-size: 0.9rem;
+        }
+        .category-panel {
+          padding: 0.75rem;
           gap: 0.5rem;
         }
-
-        .category-panel button {
-          padding: 0.45rem 0.7rem;
-          font-size: 0.85rem;
-          min-height: 32px;
-        }
-
-        .category-panel button i {
+        .category-btn {
+          padding: 0.6rem 0.8rem;
           font-size: 0.8rem;
         }
-      }
-
-      @media (max-width: 576px) {
-        .main-container {
-          padding-top: 10px;
+        .bottom-toolbar {
+          bottom: 0.75rem;
+          right: 0.75rem;
+          gap: 0.5rem;
         }
-
-        .canvas-area {
-          height: clamp(30vh, 60vh, 65vh);
-        }
-
-        .toolbar {
-          padding: 4px 6px;
-        }
-
-        .bottom-right-toolbar {
-          padding: 4px 6px;
-        }
-
-        .category-panel {
-          padding: 0.7rem;
-          gap: 0.4rem;
-          max-width: 100%;
-        }
-
-        .category-panel button {
-          font-size: clamp(0.55rem, 1.1vw, 0.7rem);
-          padding: 0.15rem 0.35rem;
-          min-height: 26px;
-        }
-
-        .category-panel button i {
-          font-size: clamp(9px, 1.3vw, 11px);
-        }
-
-        .category-panel button.active {
-          transform: scale(1.04);
-          box-shadow: 0 0 14px var(--shadow-cyan);
-        }
-
-        .modal-title {
-          font-size: 1.1rem;
-        }
-
-        .modal-body {
-          padding: 1rem;
-        }
-      }
-
-      #tutorialModal .modal-dialog {
-        position: fixed;
-        bottom: 10vh;
-        left: 50%;
-        transform: translateX(-50%);
-        margin: 0;
-        max-width: 90vw;
       }
     </style>
   </head>
   <body>
-    <canvas id="background"></canvas>
-    <div class="progress-container" id="progressContainer">
-      <div class="progress-bar"></div>
+    <canvas id="constellation-canvas"></canvas>
+
+    <div class="top-header">
+      <span class="app-title">Anatomy Annotator</span> <span class="brand">by Vioo AI</span>
+    </div>
+
+    <div class="progress-overlay" id="progressOverlay">
+      <div class="progress-spinner"></div>
     </div>
 
     <div class="main-container">
-      <div class="canvas-wrapper">
+      <div class="canvas-column">
         <div class="toolbar" id="toolbar">
-          <div class="left-buttons">
-            <button
-              class="btn"
-              id="newImageBtn"
-              data-bs-toggle="tooltip"
-              data-bs-placement="top"
-              title="Charger"
-            >
+          <div class="toolbar-group">
+            <button class="toolbar-btn" id="newImageBtn" data-tooltip="Charger">
               <i class="fas fa-download"></i>
             </button>
-            <button
-              class="btn"
-              id="saveBtn"
-              data-bs-toggle="tooltip"
-              data-bs-placement="top"
-              title="Enregistrer"
-            >
+            <button class="toolbar-btn" id="saveBtn" data-tooltip="Enregistrer">
               <i class="fas fa-save"></i>
             </button>
             <button
-              class="btn"
+              class="toolbar-btn"
               id="historyBtn"
-              data-bs-toggle="tooltip"
-              data-bs-placement="top"
-              title="Historique"
+              data-tooltip="Historique"
             >
               <i class="fas fa-history"></i>
             </button>
             <button
-              class="btn"
+              class="toolbar-btn"
               id="toggleAnnotationsBtn"
-              data-bs-toggle="tooltip"
-              data-bs-placement="top"
-              title="Afficher/Masquer"
+              data-tooltip="Afficher/Masquer"
             >
               <i class="fas fa-eye"></i>
             </button>
           </div>
-          <div class="right-buttons">
-            <button
-              class="btn"
-              id="tutorialBtn"
-              data-bs-toggle="tooltip"
-              data-bs-placement="top"
-              title="Aide"
-            >
+          <div class="toolbar-group">
+            <button class="toolbar-btn" id="tutorialBtn" data-tooltip="Aide">
               <i class="fas fa-question-circle"></i>
             </button>
-            <button
-              class="btn"
-              id="backBtn"
-              data-bs-toggle="tooltip"
-              data-bs-placement="top"
-              title="Retour"
-            >
+            <button class="toolbar-btn" id="backBtn" data-tooltip="Retour">
               <i class="fas fa-arrow-left"></i>
             </button>
           </div>
         </div>
-        <div class="canvas-area">
-          <div class="no-image-placeholder" id="noImagePlaceholder">
-            <h5>Prêt à disséquer ?</h5>
-            <p>Utilisez le bouton "Charger" pour importer une image.</p>
+
+        <div class="canvas-wrapper">
+          <div class="canvas-area">
+            <div id="noImagePlaceholder">
+              <h5>Prêt à disséquer ?</h5>
+              <p>Utilisez le bouton "Charger" pour importer une image.</p>
+            </div>
+            <canvas id="canvas"></canvas>
           </div>
-          <canvas id="canvas" style="display: none"></canvas>
-        </div>
-        <div class="bottom-right-toolbar">
-          <button
-            class="btn"
-            id="undoBtn"
-            data-bs-toggle="tooltip"
-            data-bs-placement="top"
-            title="Annuler"
-          >
-            <i class="fas fa-undo"></i>
-          </button>
-          <button
-            class="btn"
-            id="redoBtn"
-            data-bs-toggle="tooltip"
-            data-bs-placement="top"
-            title="Refaire"
-          >
-            <i class="fas fa-redo"></i>
-          </button>
-          <button
-            class="btn"
-            id="clearAllBtn"
-            data-bs-toggle="tooltip"
-            data-bs-placement="top"
-            title="Supprimer"
-          >
-            <i class="fas fa-trash"></i>
-          </button>
+          <div class="bottom-toolbar">
+            <button class="toolbar-btn" id="undoBtn" data-tooltip="Annuler">
+              <i class="fas fa-undo"></i>
+            </button>
+            <button class="toolbar-btn" id="redoBtn" data-tooltip="Refaire">
+              <i class="fas fa-redo"></i>
+            </button>
+            <button
+              class="toolbar-btn"
+              id="clearAllBtn"
+              data-tooltip="Supprimer"
+            >
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
         </div>
       </div>
+
       <div class="category-panel">
-        <button class="btn" id="cat3" data-category="3">Artère Cystique</button>
-        <button class="btn" id="cat4" data-category="4">Canal Cystique</button>
-        <button class="btn" id="cat5" data-category="5">
+        <button class="category-btn" id="cat3" data-category="3">
+          Artère Cystique
+        </button>
+        <button class="category-btn" id="cat4" data-category="4">
+          Canal Cystique
+        </button>
+        <button class="category-btn" id="cat5" data-category="5">
           Vésicule Biliaire
         </button>
-        <button class="btn" id="cat7" data-category="7">Foie</button>
-        <button class="btn" id="cat6" data-category="6">Outil</button>
+        <button class="category-btn" id="cat7" data-category="7">Foie</button>
+        <button class="category-btn" id="cat6" data-category="6">Outil</button>
+        <button class="category-btn" id="cat8" data-category="8">
+          Voie Biliaire Principale
+        </button>
       </div>
     </div>
 
@@ -765,257 +575,144 @@
       style="display: none"
     />
 
-    <div
-      class="modal fade"
-      id="tutorialModal"
-      tabindex="-1"
-      aria-labelledby="tutorialModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5
-              class="modal-title text-center w-100 fw-bold"
-              id="tutorialModalLabel"
-            >
-              Instructions
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
+    <!-- Modals -->
+    <div class="modal-overlay" id="tutorialModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Instructions</h5>
+          <button type="button" class="btn-close" data-dismiss="modal">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+            <strong>1. Charger :</strong> Importez votre image via le bouton
+            <i class="fas fa-download"></i>.
+          </p>
+          <p>
+            <strong>2. Choisir :</strong> Sélectionnez une structure anatomique
+            dans le panneau de droite.
+          </p>
+          <p>
+            <strong>3. Annoter :</strong> Maintenez le clic ou le toucher pour
+            dessiner. Relâchez pour finaliser.
+          </p>
+          <p>
+            <strong>4. Sauvegarder :</strong> Enregistrez vos annotations via le
+            bouton <i class="fas fa-save"></i>.
+          </p>
+          <div class="form-check mt-3">
+              <input type="checkbox" class="form-check-input" id="dontShowAgain">
+              <label class="form-check-label" for="dontShowAgain">Ne plus afficher au démarrage</label>
           </div>
-          <div class="modal-body">
-            <div class="d-flex flex-column gap-3">
-              <div class="d-flex align-items-start gap-3">
-                <div>
-                  <strong>1. Charger une image</strong>
-                  <p>Cliquez sur "Charger" pour importer votre image.</p>
-                </div>
-              </div>
-              <div class="d-flex align-items-start gap-3">
-                <div>
-                  <strong>2. Choisir une catégorie</strong>
-                  <p>
-                    Sélectionnez une structure anatomique dans le panneau de
-                    droite.
-                  </p>
-                </div>
-              </div>
-              <div class="d-flex align-items-start gap-3">
-                <div>
-                  <strong>3. Annoter</strong>
-                  <p>
-                    Maintenez le clic ou le toucher pour dessiner un masque.
-                    Relâchez pour finaliser.
-                  </p>
-                </div>
-              </div>
-              <div class="d-flex align-items-start gap-3">
-                <div>
-                  <strong>4. Sauvegarder</strong>
-                  <p>Enregistrez vos annotations pour les partager.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <div class="form-check">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="dontShowAgain"
-              />
-              <label class="form-check-label" for="dontShowAgain"
-                >Ne plus afficher au démarrage</label
-              >
-            </div>
-            <button
-              type="button"
-              class="btn btn-primary"
-              data-bs-dismiss="modal"
-            >
-              C'est parti
-            </button>
-          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">
+            C'est parti
+          </button>
         </div>
       </div>
     </div>
 
-    <div
-      class="modal fade"
-      id="confirmModal"
-      tabindex="-1"
-      aria-labelledby="confirmModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title text-center w-100" id="confirmModalLabel">
-              Confirmation
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <p id="confirmMessage"></p>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Annuler
-            </button>
-            <button type="button" class="btn btn-primary" id="confirmActionBtn">
-              Confirmer
-            </button>
-          </div>
+    <div class="modal-overlay" id="confirmModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmModalLabel">Confirmation</h5>
+          <button type="button" class="btn-close" data-dismiss="modal">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <p id="confirmMessage"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Annuler
+          </button>
+          <button type="button" class="btn btn-primary" id="confirmActionBtn">
+            Confirmer
+          </button>
         </div>
       </div>
     </div>
 
-    <div
-      class="modal fade"
-      id="imageChangeModal"
-      tabindex="-1"
-      aria-labelledby="imageChangeModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5
-              class="modal-title text-center w-100"
-              id="imageChangeModalLabel"
-            >
-              Changer d'image
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <p>
-              Voulez-vous enregistrer vos annotations avant de charger une
-              nouvelle image ?
-            </p>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Annuler
-            </button>
-            <button type="button" class="btn btn-primary" id="saveAndChangeBtn">
-              Enregistrer et changer
-            </button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              id="changeWithoutSavingBtn"
-            >
-              Changer sans enregistrer
-            </button>
-          </div>
+    <div class="modal-overlay" id="imageChangeModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="imageChangeModalLabel">Changer d'image</h5>
+          <button type="button" class="btn-close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p>Voulez-vous enregistrer vos annotations avant de charger une nouvelle image ?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-primary" id="saveAndChangeBtn">Enregistrer et changer</button>
+          <button type="button" class="btn btn-primary" id="changeWithoutSavingBtn">Changer sans enregistrer</button>
         </div>
       </div>
     </div>
 
-    <div
-      class="modal fade"
-      id="historyModal"
-      tabindex="-1"
-      aria-labelledby="historyModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title text-center w-100" id="historyModalLabel">
-              Historique des images annotées
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <ul class="list-group" id="historyList"></ul>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Fermer
-            </button>
-          </div>
+    <div class="modal-overlay" id="historyModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="historyModalLabel">Historique des images annotées</h5>
+          <button type="button" class="btn-close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <ul class="list-group" id="historyList"></ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
         </div>
       </div>
     </div>
 
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-      crossorigin="anonymous"
-    ></script>
     <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("/sw.js", { scope: "/" })
-            .then((reg) => console.log("Service Worker registered:", reg.scope))
-            .catch((err) =>
-              console.error("Service Worker registration failed:", err)
-            );
-        });
-      }
+      // Removed Service Worker registration as it causes errors in this environment
+      // if ("serviceWorker" in navigator) {
+      //   window.addEventListener("load", () => {
+      //     navigator.serviceWorker
+      //       .register("/sw.js", { scope: "/" })
+      //       .then((reg) => console.log("Service Worker registered:", reg.scope))
+      //       .catch((err) =>
+      //         console.error("Service Worker registration failed:", err)
+      //       );
+      //   });
+      // }
 
-      let deferredPrompt;
+      // --- Global Variables ---
       const canvas = document.getElementById("canvas");
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
       const placeholder = document.getElementById("noImagePlaceholder");
+      const constellationCanvas = document.getElementById(
+        "constellation-canvas"
+      );
       const wrapper = document.querySelector(".canvas-wrapper");
+      const progressOverlay = document.getElementById("progressOverlay");
+
       let image = null;
       const annotations = [];
       let undoneAnnotations = [];
-      let currentCategory = 1;
+      let currentCategory = 3;
       let maskPoints = [];
       let isDrawing = false;
-      let imageId = 1;
-      let annotationId = 0;
-      let zoomLevel = 1;
       let showAnnotations = true;
       let isSaved = true;
-      let isViewOnly = false;
+      let isViewOnly = false; // To handle images loaded from history as view-only
       let sessionAnnotatedImages = localStorage.getItem("lastAnnotatedImage")
-        ? [localStorage.getItem("lastAnnotatedImage")]
-        : [];
+        ? JSON.parse(localStorage.getItem("lastAnnotatedImage"))
+        : []; // Store as array of names
+      let imageIdCounter = 1; // For unique image IDs
+      let annotationIdCounter = 0; // For unique annotation IDs
       let prevContainerSize = { width: 0, height: 0 };
+
 
       const defaultCategories = {
         3: {
           id: 3,
           name: "cystic_artery",
-          color: "rgb(22, 163, 74)",
+          color: "rgb(22, 163, 74)", // vert foncé
           supercategory: "anatomy",
           displayName: "Artère Cystique",
           icon: "fa-project-diagram",
@@ -1023,7 +720,7 @@
         4: {
           id: 4,
           name: "cystic_duct",
-          color: "rgb(37, 99, 235)",
+          color: "rgb(37, 99, 235)", // bleu
           supercategory: "anatomy",
           displayName: "Canal Cystique",
           icon: "fa-water",
@@ -1031,7 +728,7 @@
         5: {
           id: 5,
           name: "gallbladder",
-          color: "rgb(217, 119, 6)",
+          color: "rgb(217, 119, 6)", // orange
           supercategory: "anatomy",
           displayName: "Vésicule Biliaire",
           icon: "fa-leaf",
@@ -1039,1182 +736,30 @@
         7: {
           id: 7,
           name: "liver",
-          color: "rgb(148, 0, 211)",
+          color: "rgb(148, 0, 211)", // violet
           supercategory: "anatomy",
           displayName: "Foie",
           icon: "fa-liver",
         },
         6: {
           id: 6,
-          name: "outil",
-          color: "rgb(185, 28, 28)",
+          name: "tool",
+          color: "rgb(185, 28, 28)", // rouge
           supercategory: "tool",
           displayName: "Outil",
           icon: "fa-tools",
         },
+        8: {
+          id: 8,
+          name: "common_bile_duct",
+          color: "rgb(246, 190, 0)", // jaune
+          supercategory: "anatomy",
+          displayName: "Voie Biliaire Principale",
+          icon: "fa-vial", // Exemple d'icône
+        },
       };
 
-      let categories = { ...defaultCategories };
-
-      function hexToRgba(hex, alpha) {
-        try {
-          hex = hex.replace("#", "");
-          const r = parseInt(hex.substring(0, 2), 16);
-          const g = parseInt(hex.substring(2, 4), 16);
-          const b = parseInt(hex.substring(4, 6), 16);
-          return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-        } catch (e) {
-          console.error("Error in hexToRgba:", e);
-          return `rgba(128, 128, 128, ${alpha})`;
-        }
-      }
-
-      function showConfirmModal(
-        title,
-        message,
-        confirmCallback,
-        cancelCallback
-      ) {
-        try {
-          const modal = new bootstrap.Modal(
-            document.getElementById("confirmModal")
-          );
-          document.getElementById("confirmModalLabel").textContent = title;
-          document.getElementById("confirmMessage").textContent = message;
-          const confirmBtn = document.getElementById("confirmActionBtn");
-          const cancelBtn = document.querySelector(
-            "#confirmModal .btn-secondary"
-          );
-
-          confirmBtn.replaceWith(confirmBtn.cloneNode(true));
-          cancelBtn.replaceWith(cancelBtn.cloneNode(true));
-
-          const newConfirmBtn = document.getElementById("confirmActionBtn");
-          const newCancelBtn = document.querySelector(
-            "#confirmModal .btn-secondary"
-          );
-
-          newConfirmBtn.addEventListener("click", () => {
-            confirmCallback();
-            modal.hide();
-          });
-
-          newCancelBtn.addEventListener("click", () => {
-            if (cancelCallback) cancelCallback();
-            modal.hide();
-          });
-
-          modal.show();
-        } catch (e) {
-          console.error("Error in showConfirmModal:", e);
-        }
-      }
-
-      function showImageChangeModal(file) {
-        try {
-          const modal = new bootstrap.Modal(
-            document.getElementById("imageChangeModal")
-          );
-          const saveAndChangeBtn = document.getElementById("saveAndChangeBtn");
-          const changeWithoutSavingBtn = document.getElementById(
-            "changeWithoutSavingBtn"
-          );
-          const cancelBtn = document.querySelector(
-            "#imageChangeModal .btn-secondary"
-          );
-
-          saveAndChangeBtn.replaceWith(saveAndChangeBtn.cloneNode(true));
-          changeWithoutSavingBtn.replaceWith(
-            changeWithoutSavingBtn.cloneNode(true)
-          );
-          cancelBtn.replaceWith(cancelBtn.cloneNode(true));
-
-          const newSaveAndChangeBtn =
-            document.getElementById("saveAndChangeBtn");
-          const newChangeWithoutSavingBtn = document.getElementById(
-            "changeWithoutSavingBtn"
-          );
-          const newCancelBtn = document.querySelector(
-            "#imageChangeModal .btn-secondary"
-          );
-
-          newSaveAndChangeBtn.addEventListener("click", () => {
-            saveAll();
-            checkAndLoadImage(file);
-            modal.hide();
-          });
-
-          newChangeWithoutSavingBtn.addEventListener("click", () => {
-            isSaved = true;
-            checkAndLoadImage(file);
-            modal.hide();
-          });
-
-          newCancelBtn.addEventListener("click", () => {
-            modal.hide();
-          });
-
-          modal.show();
-        } catch (e) {
-          console.error("Error in showImageChangeModal:", e);
-        }
-      }
-
-      function showHistoryModal() {
-        try {
-          const modal = new bootstrap.Modal(
-            document.getElementById("historyModal")
-          );
-          const historyList = document.getElementById("historyList");
-          historyList.innerHTML = "";
-
-          if (sessionAnnotatedImages.length === 0) {
-            historyList.innerHTML =
-              '<li class="list-group-item">Aucune image annotée dans cette session</li>';
-          } else {
-            sessionAnnotatedImages.forEach((imageName) => {
-              const listItem = document.createElement("li");
-              listItem.className = "list-group-item";
-              listItem.textContent = imageName;
-              listItem.addEventListener("click", () => {
-                loadImageFromHistory(imageName);
-                modal.hide();
-              });
-              historyList.appendChild(listItem);
-            });
-          }
-
-          modal.show();
-        } catch (e) {
-          console.error("Error in showHistoryModal:", e);
-        }
-      }
-
-      function loadImageFromHistory(imageName) {
-        try {
-          const imageInput = document.getElementById("imageInput");
-          imageInput.value = "";
-          imageInput.click();
-
-          imageInput.onchange = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            if (file.name !== imageName) return;
-
-            if (!isSaved && (annotations.length > 0 || maskPoints.length > 0)) {
-              showImageChangeModal(file);
-            } else {
-              checkAndLoadImage(file);
-            }
-          };
-        } catch (e) {
-          console.error("Error in loadImageFromHistory:", e);
-        }
-      }
-
-      function checkUnsavedChanges(callback) {
-        if (!isSaved && (annotations.length > 0 || maskPoints.length > 0)) {
-          showConfirmModal(
-            "Modifications non enregistrées",
-            "Vous avez des modifications non enregistrées. Voulez-vous enregistrer avant de continuer ?",
-            () => {
-              saveAll();
-              callback();
-            },
-            () => {
-              callback();
-            }
-          );
-        } else {
-          callback();
-        }
-      }
-
-      function setupEventHandlers() {
-        try {
-          const buttons = {
-            undoBtn: () => {
-              if (!isViewOnly) {
-                undoAnnotation();
-                isSaved = false;
-              }
-            },
-            redoBtn: () => {
-              if (!isViewOnly) {
-                redoAnnotation();
-                isSaved = false;
-              }
-            },
-            clearAllBtn: () => {
-              if (!isViewOnly) {
-                showConfirmModal(
-                  "Supprimer toutes les annotations",
-                  "Voulez-vous vraiment supprimer toutes les annotations ? Cette action est irréversible.",
-                  () => {
-                    clearAllAnnotations();
-                    isSaved = false;
-                  }
-                );
-              }
-            },
-            saveBtn: debounce(() => {
-              saveAll();
-              isSaved = true;
-            }, 1000),
-            newImageBtn: () => {
-              const imageInput = document.getElementById("imageInput");
-              if (
-                !isSaved &&
-                (annotations.length > 0 || maskPoints.length > 0)
-              ) {
-                showImageChangeModal(imageInput.files[0]);
-              } else {
-                imageInput.click();
-              }
-            },
-            historyBtn: () => {
-              showHistoryModal();
-            },
-            toggleAnnotationsBtn: toggleAnnotations,
-            backBtn: () => {
-              checkUnsavedChanges(() => (window.location.href = "index.html"));
-            },
-            tutorialBtn: () => {
-              const tutorialModal = new bootstrap.Modal(
-                document.getElementById("tutorialModal")
-              );
-              tutorialModal.show();
-            },
-          };
-
-          Object.entries(buttons).forEach(([id, handler]) => {
-            const button = document.getElementById(id);
-            if (button) {
-              console.log(`Attaching listener to button: ${id}`);
-              button.replaceWith(button.cloneNode(true));
-              const newButton = document.getElementById(id);
-              newButton.addEventListener("click", handler);
-            } else {
-              console.error(`Button with ID ${id} not found`);
-            }
-          });
-
-          const imageInput = document.getElementById("imageInput");
-          if (imageInput) {
-            console.log("Attaching listener to imageInput");
-            imageInput.replaceWith(imageInput.cloneNode(true));
-            const newImageInput = document.getElementById("imageInput");
-            newImageInput.addEventListener("change", (e) => {
-              if (e.target.files[0]) {
-                if (
-                  !isSaved &&
-                  (annotations.length > 0 || maskPoints.length > 0)
-                ) {
-                  showImageChangeModal(e.target.files[0]);
-                } else {
-                  checkAndLoadImage(e.target.files[0]);
-                }
-              }
-            });
-          } else {
-            console.error("imageInput not found");
-          }
-
-          const categoryButtons = document.querySelectorAll(
-            ".category-panel button"
-          );
-          categoryButtons.forEach((button) => {
-            const id = button.id;
-            console.log(`Attaching listener to category button: ${id}`);
-            button.replaceWith(button.cloneNode(true));
-            const newButton = document.getElementById(id);
-            newButton.addEventListener("click", () => {
-              selectCategory(parseInt(newButton.dataset.category));
-            });
-          });
-
-          const tutorialModalEl = document.getElementById("tutorialModal");
-          if (tutorialModalEl) {
-            console.log("Attaching listener to tutorialModal");
-            tutorialModalEl.addEventListener("hidden.bs.modal", () => {
-              console.log("Tutorial modal closed");
-              canvas.focus();
-              setupCanvasEventListeners();
-            });
-          }
-
-          const confirmModalEl = document.getElementById("confirmModal");
-          if (confirmModalEl) {
-            console.log("Attaching listener to confirmModal");
-            confirmModalEl.addEventListener("hidden.bs.modal", () => {
-              console.log("Confirm modal closed");
-              canvas.focus();
-              setupCanvasEventListeners();
-            });
-          }
-
-          ["dragenter", "dragover", "dragleave", "drop"].forEach((event) => {
-            wrapper.addEventListener(event, (e) => e.preventDefault());
-          });
-          wrapper.addEventListener("drop", (e) => {
-            const files = e.dataTransfer.files;
-            if (files[0]) {
-              if (
-                !isSaved &&
-                (annotations.length > 0 || maskPoints.length > 0)
-              ) {
-                showImageChangeModal(files[0]);
-              } else {
-                checkAndLoadImage(files[0]);
-              }
-            }
-          });
-
-          const tooltipTriggerList = document.querySelectorAll(
-            '[data-bs-toggle="tooltip"]'
-          );
-          tooltipTriggerList.forEach((tooltipTriggerEl) => {
-            new bootstrap.Tooltip(tooltipTriggerEl);
-          });
-
-          if (!localStorage.getItem("tutorialShown")) {
-            const tutorialModal = new bootstrap.Modal(
-              document.getElementById("tutorialModal")
-            );
-            tutorialModal.show();
-          }
-
-          document
-            .getElementById("dontShowAgain")
-            .addEventListener("change", (e) => {
-              if (e.target.checked) {
-                localStorage.setItem("tutorialShown", "true");
-              }
-            });
-
-          document.addEventListener("keydown", (e) => {
-            if (e.key === "Escape" && maskPoints.length > 0 && !isViewOnly) {
-              cancelAnnotation();
-              isSaved = false;
-            }
-          });
-
-          setupCanvasEventListeners();
-          setupBackgroundCanvas();
-        } catch (e) {
-          console.error("Error in setupEventHandlers:", e);
-        }
-      }
-
-      function setupBackgroundCanvas() {
-        try {
-          const bgCanvas = document.getElementById("background");
-          const bgCtx = bgCanvas.getContext("2d");
-          let w,
-            h,
-            particles = [];
-
-          function randomRange(min, max) {
-            return Math.random() * (max - min) + min;
-          }
-
-          function initCanvas() {
-            w = bgCanvas.width = window.innerWidth;
-            h = bgCanvas.height = window.innerHeight;
-            particles = [];
-            const particleCount = Math.min(50, Math.floor((w * h) / 20000));
-            for (let i = 0; i < particleCount; i++) {
-              particles.push({
-                x: Math.random() * w,
-                y: Math.random() * h,
-                vx: randomRange(-0.5, 0.5),
-                vy: randomRange(-0.5, 0.5),
-                r: randomRange(1, 2.5),
-                opacity: randomRange(0.3, 0.7),
-              });
-            }
-          }
-
-          function draw() {
-            bgCtx.clearRect(0, 0, w, h);
-            particles.forEach((p) => {
-              bgCtx.beginPath();
-              bgCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-              bgCtx.fillStyle = `rgba(38, 166, 154, ${p.opacity})`;
-              bgCtx.fill();
-
-              p.x += p.vx;
-              p.y += p.vy;
-              if (p.x < 0 || p.x > w) p.vx *= -1;
-              if (p.y < 0 || p.y > h) p.vy *= -1;
-            });
-            requestAnimationFrame(draw);
-          }
-
-          window.addEventListener("resize", initCanvas);
-          initCanvas();
-          draw();
-        } catch (e) {
-          console.error("Error in setupBackgroundCanvas:", e);
-        }
-      }
-
-      function cancelAnnotation() {
-        try {
-          if (maskPoints.length > 0) {
-            maskPoints = [];
-            isDrawing = false;
-            redrawCanvas();
-          }
-        } catch (e) {
-          console.error("Error in cancelAnnotation:", e);
-        }
-      }
-
-      function toggleAnnotations() {
-        try {
-          showAnnotations = !showAnnotations;
-          const toggleBtn = document.getElementById("toggleAnnotationsBtn");
-          toggleBtn.innerHTML = showAnnotations
-            ? '<i class="fas fa-eye"></i>'
-            : '<i class="fas fa-eye-slash"></i>';
-          redrawCanvas();
-        } catch (e) {
-          console.error("Error in toggleAnnotations:", e);
-        }
-      }
-
-      function setupCanvasEventListeners() {
-        try {
-          canvas.removeEventListener("touchstart", handleTouchStart);
-          canvas.removeEventListener("touchmove", handleTouchMove);
-          canvas.removeEventListener("touchend", handleTouchEnd);
-          canvas.removeEventListener("mousedown", handleMouseDown);
-          canvas.removeEventListener("mousemove", handleMouseMove);
-          canvas.removeEventListener("mouseup", handleMouseUp);
-          canvas.removeEventListener("contextmenu", handleContextMenu);
-
-          if (!isViewOnly) {
-            canvas.addEventListener("touchstart", handleTouchStart, {
-              passive: false,
-            });
-            canvas.addEventListener("touchmove", handleTouchMove, {
-              passive: false,
-            });
-            canvas.addEventListener("touchend", handleTouchEnd, {
-              passive: false,
-            });
-            canvas.addEventListener("mousedown", handleMouseDown);
-            canvas.addEventListener("mousemove", handleMouseMove);
-            canvas.addEventListener("mouseup", handleMouseUp);
-            canvas.addEventListener("contextmenu", handleContextMenu);
-          }
-        } catch (e) {
-          console.error("Error in setupCanvasEventListeners:", e);
-        }
-      }
-
-      function handleContextMenu(e) {
-        e.preventDefault();
-      }
-
-      function getTransformedPos(clientX, clientY) {
-        try {
-          if (!image) return { x: 0, y: 0 };
-          const rect = canvas.getBoundingClientRect();
-          const container = document.querySelector(".canvas-area");
-          const containerRect = container.getBoundingClientRect();
-
-          const imgRatio = image.width / image.height;
-          const canvasRatio = rect.width / rect.height;
-          let imgWidth, imgHeight, offsetX, offsetY;
-
-          if (imgRatio > canvasRatio) {
-            imgWidth = rect.width;
-            imgHeight = imgWidth / imgRatio;
-            offsetX = 0;
-            offsetY = (rect.height - imgHeight) / 2;
-          } else {
-            imgHeight = rect.height;
-            imgWidth = imgHeight * imgRatio;
-            offsetX = (rect.width - imgWidth) / 2;
-            offsetY = 0;
-          }
-
-          const relX = clientX - rect.left - offsetX;
-          const relY = clientY - rect.top - offsetY;
-
-          if (relX < 0 || relX > imgWidth || relY < 0 || relY > imgHeight) {
-            return { x: -1, y: -1 };
-          }
-
-          const x = (relX / imgWidth) * image.width;
-          const y = (relY / imgHeight) * image.height;
-
-          return {
-            x: Math.max(0, Math.min(x, image.width)),
-            y: Math.max(0, Math.min(y, image.height)),
-          };
-        } catch (e) {
-          console.error("Error in getTransformedPos:", e);
-          return { x: 0, y: 0 };
-        }
-      }
-
-      function handleTouchStart(e) {
-        e.preventDefault();
-        if (!image || isViewOnly) return;
-
-        try {
-          const touch = e.touches[0];
-          const { x, y } = getTransformedPos(touch.clientX, touch.clientY);
-          if (x < 0 || y < 0) return;
-          if (e.touches.length === 1) {
-            isDrawing = true;
-            maskPoints = [{ x, y }];
-            isSaved = false;
-            redrawCanvas();
-          }
-        } catch (e) {
-          console.error("Error in handleTouchStart:", e);
-        }
-      }
-
-      function handleTouchMove(e) {
-        e.preventDefault();
-        if (!image || isViewOnly || !isDrawing) return;
-
-        try {
-          const touch = e.touches[0];
-          const { x, y } = getTransformedPos(touch.clientX, touch.clientY);
-          if (x < 0 || y < 0) return;
-          const lastPoint = maskPoints[maskPoints.length - 1];
-          const distance = Math.sqrt(
-            (x - lastPoint.x) ** 2 + (y - lastPoint.y) ** 2
-          );
-          if (distance > 1) {
-            maskPoints.push({ x, y });
-            redrawCanvas();
-            drawTemporaryMask();
-          }
-        } catch (e) {
-          console.error("Error in handleTouchMove:", e);
-        }
-      }
-
-      function handleTouchEnd(e) {
-        e.preventDefault();
-        if (!image || isViewOnly || !isDrawing) return;
-
-        try {
-          isDrawing = false;
-          finalizeMask();
-        } catch (e) {
-          console.error("Error in handleTouchEnd:", e);
-        }
-      }
-
-      function handleMouseDown(e) {
-        if (!image || isViewOnly || e.button !== 0) return;
-
-        try {
-          const { x, y } = getTransformedPos(e.clientX, e.clientY);
-          if (x < 0 || y < 0) return;
-          isDrawing = true;
-          maskPoints = [{ x, y }];
-          isSaved = false;
-          redrawCanvas();
-        } catch (e) {
-          console.error("Error in handleMouseDown:", e);
-        }
-      }
-
-      function handleMouseMove(e) {
-        if (!image || isViewOnly || !isDrawing) return;
-
-        try {
-          const { x, y } = getTransformedPos(e.clientX, e.clientY);
-          if (x < 0 || y < 0) return;
-          const lastPoint = maskPoints[maskPoints.length - 1];
-          const distance = Math.sqrt(
-            (x - lastPoint.x) ** 2 + (y - lastPoint.y) ** 2
-          );
-          if (distance > 1) {
-            maskPoints.push({ x, y });
-            redrawCanvas();
-            drawTemporaryMask();
-          }
-        } catch (e) {
-          console.error("Error in handleMouseMove:", e);
-        }
-      }
-
-      function handleMouseUp(e) {
-        if (!image || isViewOnly || !isDrawing) return;
-
-        try {
-          isDrawing = false;
-          finalizeMask();
-        } catch (e) {
-          console.error("Error in handleMouseUp:", e);
-        }
-      }
-
-      function initializeCanvas(img) {
-        try {
-          const container = document.querySelector(".canvas-area");
-          const maxWidth = container.clientWidth;
-          const maxHeight = container.clientHeight;
-          const scale = Math.min(maxWidth / img.width, maxHeight / img.height);
-          canvas.width = img.width * scale;
-          canvas.height = img.height * scale;
-          canvas.style.display = "block";
-          placeholder.style.display = "none";
-          zoomLevel = 1;
-          canvas.style.transform = `scale(${zoomLevel})`;
-          redrawCanvas();
-          isSaved = true;
-        } catch (e) {
-          console.error("Error in initializeCanvas:", e);
-        }
-      }
-
-      function checkAndLoadImage(file) {
-        try {
-          if (image && file.name === image.file_name) {
-            return;
-          }
-          if (sessionAnnotatedImages.includes(file.name)) {
-            isViewOnly = true;
-            loadImage(file);
-          } else {
-            isViewOnly = false;
-            loadImage(file);
-          }
-        } catch (e) {
-          console.error("Error in checkAndLoadImage:", e);
-        }
-      }
-
-      function loadImage(file) {
-        try {
-          const progressContainer =
-            document.getElementById("progressContainer");
-          progressContainer.classList.add("active");
-
-          if (!file.type.startsWith("image/")) {
-            progressContainer.classList.remove("active");
-            return;
-          }
-
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const img = new Image();
-            img.src = e.target.result;
-            img.onload = () => {
-              setTimeout(
-                () => progressContainer.classList.remove("active"),
-                300
-              );
-
-              annotations.length = 0;
-              maskPoints = [];
-              isDrawing = false;
-
-              image = {
-                file_name: file.name,
-                image: img,
-                id: imageId++,
-                height: img.height,
-                width: img.width,
-                video_id: 1, // ou générer dynamiquement
-                frame_id: null,
-                is_det_keyframe: true,
-                is_ds_keyframe: true,
-                ds: [0.0, 0.0, 0.0],
-              };
-
-              initializeCanvas(img);
-              showAnnotations = true;
-              document.getElementById("toggleAnnotationsBtn").innerHTML =
-                '<i class="fas fa-eye"></i>';
-              setupCanvasEventListeners();
-            };
-            img.onerror = () => {
-              progressContainer.classList.remove("active");
-            };
-          };
-          reader.onerror = () => {
-            progressContainer.classList.remove("active");
-          };
-          reader.readAsDataURL(file);
-        } catch (e) {
-          console.error("Error in loadImage:", e);
-        }
-      }
-
-      function redrawCanvas() {
-        try {
-          if (!image) return;
-
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(image.image, 0, 0, canvas.width, canvas.height);
-
-          if (showAnnotations) {
-            const labelRects = [];
-
-            annotations.forEach((anno) => {
-              const category = categories[anno.category_id];
-              const color = category?.color || "rgb(128, 128, 128)";
-              ctx.strokeStyle = color;
-              ctx.fillStyle = color
-                .replace("rgb", "rgba")
-                .replace(")", ", 0.2)");
-              ctx.lineWidth = 2;
-
-              const scaleX = canvas.width / image.width;
-              const scaleY = canvas.height / image.height;
-              // Convertir la segmentation polygon back en points pour l'affichage
-              const maskPoints = convertSegmentationToPoints(
-                anno.segmentation[0]
-              );
-              const scaledMask = maskPoints.map((point) => ({
-                x: point.x * scaleX,
-                y: point.y * scaleY,
-              }));
-
-              drawMask(scaledMask);
-              drawLabel(
-                categories[anno.category_id]?.displayName ||
-                  "Catégorie supprimée",
-                scaledMask,
-                anno.category_id,
-                labelRects
-              );
-            });
-
-            if (maskPoints.length > 0 && !isViewOnly) {
-              drawTemporaryMask();
-            }
-          }
-        } catch (e) {
-          console.error("Error in redrawCanvas:", e);
-        }
-      }
-
-      function drawLabel(
-        text,
-        maskPoints,
-        categoryId,
-        labelRects,
-        context = ctx
-      ) {
-        try {
-          const fontSize = 12;
-          context.font = `bold ${fontSize}px Inter`;
-          context.textBaseline = "bottom";
-          const metrics = context.measureText(text);
-          const padding = 4;
-          const labelWidth = metrics.width + padding * 4;
-          const labelHeight = fontSize + padding * 2;
-          const offset = 8;
-
-          const maskBounds = {
-            minX: Math.min(...maskPoints.map((p) => p.x)),
-            maxX: Math.max(...maskPoints.map((p) => p.x)),
-            minY: Math.min(...maskPoints.map((p) => p.y)),
-            maxY: Math.max(...maskPoints.map((p) => p.y)),
-          };
-
-          const startPoint = maskPoints[0];
-
-          const candidates = [
-            {
-              x: startPoint.x - labelWidth / 2,
-              y: startPoint.y - labelHeight - offset,
-            },
-            { x: startPoint.x - labelWidth / 2, y: startPoint.y + offset },
-            {
-              x: startPoint.x - labelWidth - offset,
-              y: startPoint.y - labelHeight / 2,
-            },
-            { x: startPoint.x + offset, y: startPoint.y - labelHeight / 2 },
-          ];
-
-          let labelX, labelY;
-          let foundPosition = false;
-
-          for (const candidate of candidates) {
-            const tempX = Math.max(
-              padding,
-              Math.min(candidate.x, canvas.width - labelWidth)
-            );
-            const tempY = Math.max(
-              padding,
-              Math.min(candidate.y, canvas.height - labelHeight)
-            );
-
-            const labelRect = {
-              x: tempX,
-              y: tempY,
-              width: labelWidth,
-              height: labelHeight,
-            };
-
-            const isOverlappingMask =
-              labelRect.x < maskBounds.maxX &&
-              labelRect.x + labelRect.width > maskBounds.minX &&
-              labelRect.y < maskBounds.maxY &&
-              labelRect.y + labelRect.height > maskBounds.minY;
-
-            const isOverlappingLabel = labelRects.some(
-              (existingRect) =>
-                labelRect.x < existingRect.x + existingRect.width &&
-                labelRect.x + labelRect.width > existingRect.x &&
-                labelRect.y < existingRect.y + existingRect.height &&
-                labelRect.y + labelRect.height > existingRect.y
-            );
-
-            if (!isOverlappingMask && !isOverlappingLabel) {
-              labelX = tempX;
-              labelY = tempY;
-              foundPosition = true;
-              labelRects.push(labelRect);
-              break;
-            }
-          }
-
-          if (!foundPosition) {
-            labelX = Math.max(
-              padding,
-              Math.min(startPoint.x - labelWidth / 2, canvas.width - labelWidth)
-            );
-            labelY = Math.max(
-              padding,
-              Math.min(
-                startPoint.y - labelHeight - offset,
-                canvas.height - labelHeight
-              )
-            );
-            labelRects.push({
-              x: labelX,
-              y: labelY,
-              width: labelWidth,
-              height: labelHeight,
-            });
-          }
-
-          context.fillStyle = "rgba(20, 40, 55, 0.4)";
-          context.filter = "blur(10px)";
-          context.fillRect(labelX, labelY, labelWidth, labelHeight);
-          context.filter = "none";
-          context.fillStyle = categories[categoryId]?.color || "#e0f2f1";
-          context.fillText(
-            text,
-            labelX + padding * 2,
-            labelY + fontSize + padding
-          );
-        } catch (e) {
-          console.error("Error in drawLabel:", e);
-        }
-      }
-
-      function drawMask(points, context = ctx) {
-        try {
-          context.beginPath();
-          points.forEach((point, i) => {
-            i === 0
-              ? context.moveTo(point.x, point.y)
-              : context.lineTo(point.x, point.y);
-          });
-          context.closePath();
-          context.fill();
-          context.stroke();
-        } catch (e) {
-          console.error("Error in drawMask:", e);
-        }
-      }
-
-      function drawTemporaryMask() {
-        try {
-          if (!maskPoints.length) return;
-
-          const category = categories[currentCategory];
-          const color = category?.color || "rgb(128, 128, 128)";
-          ctx.strokeStyle = color;
-          ctx.fillStyle = color.replace("rgb", "rgba").replace(")", ", 0.2)");
-          ctx.lineWidth = 2;
-
-          const scaleX = canvas.width / image.width;
-          const scaleY = canvas.height / image.height;
-
-          ctx.beginPath();
-          maskPoints.forEach((point, i) => {
-            const x = point.x * scaleX;
-            const y = point.y * scaleY;
-            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-          });
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-
-          const pointSize = 3;
-          ctx.fillStyle = color;
-          maskPoints.forEach((point) => {
-            ctx.beginPath();
-            ctx.arc(
-              point.x * scaleX,
-              point.y * scaleY,
-              pointSize / 2,
-              0,
-              Math.PI * 2
-            );
-            ctx.fill();
-          });
-          if (maskPoints.length > 0) {
-            ctx.fillStyle = "red";
-            ctx.beginPath();
-            ctx.arc(
-              maskPoints[0].x * scaleX,
-              maskPoints[0].y * scaleY,
-              5,
-              0,
-              Math.PI * 2
-            );
-            ctx.fill();
-          }
-        } catch (e) {
-          console.error("Error in drawTemporaryMask:", e);
-        }
-      }
-
-      function finalizeMask() {
-        try {
-          if (maskPoints.length < 3) {
-            maskPoints = [];
-            isDrawing = false;
-            redrawCanvas();
-            return;
-          }
-
-          const xs = maskPoints.map((p) => p.x);
-          const ys = maskPoints.map((p) => p.y);
-          const minX = Math.min(...xs);
-          const maxX = Math.max(...xs);
-          const minY = Math.min(...ys);
-          const maxY = Math.max(...ys);
-          const area = calculatePolygonArea(maskPoints);
-
-          const segmentation = polygonToCocoFormat(maskPoints);
-
-          if (!image.annotationIndex) {
-            image.annotationIndex = 0;
-          }
-
-          annotations.push({
-            id: image.id * 10 + image.annotationIndex++,
-            image_id: image.id,
-            category_id: currentCategory,
-            bbox: [minX, minY, maxX - minX, maxY - minY],
-            area: area,
-            segmentation: segmentation,
-            iscrowd: 0,
-          });
-
-          maskPoints = [];
-          isDrawing = false;
-          undoneAnnotations = [];
-          redrawCanvas();
-          isSaved = false;
-        } catch (e) {
-          console.error("Error in finalizeMask:", e);
-        }
-      }
-
-      function calculatePolygonArea(points) {
-        try {
-          let area = 0;
-          for (let i = 0; i < points.length; i++) {
-            const j = (i + 1) % points.length;
-            area += points[i].x * points[j].y;
-            area -= points[j].x * points[i].y;
-          }
-          return Math.abs(area / 2);
-        } catch (e) {
-          console.error("Error in calculatePolygonArea:", e);
-          return 0;
-        }
-      }
-
-      function polygonToCocoFormat(maskPoints) {
-        try {
-          // Convertir les points en format COCO: [x1, y1, x2, y2, ..., xn, yn]
-          const segmentation = [];
-          maskPoints.forEach((point) => {
-            segmentation.push(point.x);
-            segmentation.push(point.y);
-          });
-          return [segmentation]; // Array de arrays pour compatibilité COCO
-        } catch (e) {
-          console.error("Error in polygonToCocoFormat:", e);
-          return [[]];
-        }
-      }
-
-      function convertSegmentationToPoints(segmentation) {
-        try {
-          const points = [];
-          for (let i = 0; i < segmentation.length; i += 2) {
-            points.push({
-              x: segmentation[i],
-              y: segmentation[i + 1],
-            });
-          }
-          return points;
-        } catch (e) {
-          console.error("Error in convertSegmentationToPoints:", e);
-          return [];
-        }
-      }
-
-      function undoAnnotation() {
-        try {
-          const lastAnnotation = annotations.pop();
-          if (lastAnnotation) {
-            undoneAnnotations.push(lastAnnotation);
-            redrawCanvas();
-            isSaved = false;
-          }
-        } catch (e) {
-          console.error("Error in undoAnnotation:", e);
-        }
-      }
-
-      function redoAnnotation() {
-        try {
-          const lastUndone = undoneAnnotations.pop();
-          if (lastUndone) {
-            annotations.push(lastUndone);
-            redrawCanvas();
-            isSaved = false;
-          }
-        } catch (e) {
-          console.error("Error in redoAnnotation:", e);
-        }
-      }
-
-      function clearAllAnnotations() {
-        try {
-          if (annotations.length === 0) return;
-          annotations.forEach((anno) => undoneAnnotations.push(anno));
-          annotations.length = 0;
-          maskPoints = [];
-          isDrawing = false;
-          redrawCanvas();
-          isSaved = false;
-        } catch (e) {
-          console.error("Error in clearAllAnnotations:", e);
-        }
-      }
-
-      function selectCategory(categoryId) {
-        try {
-          if (!categories[categoryId]) return;
-          currentCategory = categoryId;
-          document.querySelectorAll(".category-panel button").forEach((btn) => {
-            btn.classList.remove("active");
-          });
-          const button = document.getElementById(`cat${categoryId}`);
-          if (button) {
-            button.classList.add("active");
-          }
-          isSaved = false;
-        } catch (e) {
-          console.error("Error in selectCategory:", e);
-        }
-      }
-
-      function saveAll() {
-        try {
-          if (!image) return;
-
-          const outputCanvas = document.createElement("canvas");
-          outputCanvas.width = image.width;
-          outputCanvas.height = image.height;
-          const outputCtx = outputCanvas.getContext("2d");
-          outputCtx.drawImage(image.image, 0, 0, image.width, image.height);
-
-          const labelRects = [];
-          annotations.forEach((anno) => {
-            const category = categories[anno.category_id];
-            const color = category?.color || "rgb(128, 128, 128)";
-            outputCtx.strokeStyle = color;
-            outputCtx.fillStyle = color
-              .replace("rgb", "rgba")
-              .replace(")", ", 0.2)");
-            outputCtx.lineWidth = 2;
-
-            const maskPoints = convertSegmentationToPoints(
-              anno.segmentation[0]
-            );
-
-            drawMask(maskPoints, outputCtx);
-            drawLabel(
-              categories[anno.category_id]?.displayName ||
-                "Catégorie supprimée",
-              maskPoints,
-              anno.category_id,
-              labelRects,
-              outputCtx
-            );
-          });
-
-          const baseFileName = image.file_name.split(".")[0];
-          const outputFileName = `${baseFileName}_annotated`;
-
-          const imageForJson = {
-            file_name: image.file_name,
-            height: image.height,
-            width: image.width,
-            id: image.id,
-            video_id: image.video_id,
-            frame_id: image.frame_id,
-            is_det_keyframe: image.is_det_keyframe,
-            is_ds_keyframe: image.is_ds_keyframe,
-            ds: image.ds,
-          };
-
-          const jsonData = {
-            images: [imageForJson],
-            annotations: annotations,
-            categories: Object.values(categories).map((cat) => ({
-              id: cat.id,
-              name: cat.name,
-              supercategory: cat.supercategory,
-            })),
-          };
-
-          const jsonStr = JSON.stringify(jsonData, null, 2);
-          const jsonBlob = new Blob([jsonStr], { type: "application/json" });
-          const jsonUrl = URL.createObjectURL(jsonBlob);
-          const jsonLink = document.createElement("a");
-          jsonLink.href = jsonUrl;
-          jsonLink.download = `${outputFileName}.json`;
-          jsonLink.click();
-          URL.revokeObjectURL(jsonUrl);
-
-          if (!sessionAnnotatedImages.includes(image.file_name)) {
-            sessionAnnotatedImages.push(image.file_name);
-            localStorage.setItem("lastAnnotatedImage", image.file_name);
-          }
-
-          isSaved = true;
-        } catch (e) {
-          console.error("Error in saveAll:", e);
-        }
-      }
-
+      // --- Utility Functions ---
       function debounce(func, wait) {
         let timeout;
         return function executedFunction(...args) {
@@ -2227,33 +772,959 @@
         };
       }
 
-      function handleResize() {
-        try {
-          const container = document.querySelector(".canvas-area");
-          const currentSize = {
-            width: container.clientWidth,
-            height: container.clientHeight,
-          };
-          if (
-            image &&
-            (Math.abs(currentSize.width - prevContainerSize.width) > 1 ||
-              Math.abs(currentSize.height - prevContainerSize.height) > 1)
-          ) {
-            initializeCanvas(image.image);
-            prevContainerSize = currentSize;
+      // --- Constellation Background ---
+      function setupConstellationBackground() {
+        if (!constellationCanvas) return;
+        const bgCtx = constellationCanvas.getContext("2d");
+        let stars = [];
+        let animationFrameId;
+
+        const setup = () => {
+          constellationCanvas.width = window.innerWidth;
+          constellationCanvas.height = window.innerHeight;
+          stars = [];
+          // Adjust star density based on screen size
+          let starCount = Math.min(150, (window.innerWidth * window.innerHeight) / 10000);
+          for (let i = 0; i < starCount; i++) {
+            stars.push({
+              x: Math.random() * window.innerWidth,
+              y: Math.random() * window.innerHeight,
+              radius: Math.random() * 1.6 + 0.8,
+              vx: (Math.random() - 0.5) * 0.1,
+              vy: (Math.random() - 0.5) * 0.1,
+              opacity: Math.random() * 0.6 + 0.3,
+            });
           }
-          const bgCanvas = document.getElementById("background");
-          if (bgCanvas) {
-            bgCanvas.width = window.innerWidth;
-            bgCanvas.height = window.innerHeight;
-          }
-        } catch (e) {
-          console.error("Error in handleResize:", e);
+        };
+
+        const draw = () => {
+          if (!bgCtx) return;
+          bgCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+          stars.forEach((star) => {
+            bgCtx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+            bgCtx.beginPath();
+            bgCtx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+            bgCtx.fill();
+            star.x += star.vx;
+            star.y += star.vy;
+            if (star.x < 0 || star.x > window.innerWidth) star.vx *= -1;
+            if (star.y < 0 || star.y > window.innerHeight) star.vy *= -1;
+          });
+          animationFrameId = requestAnimationFrame(draw);
+        };
+
+        window.addEventListener("resize", () => {
+          cancelAnimationFrame(animationFrameId);
+          setup();
+          draw();
+        });
+
+        setup();
+        draw();
+      }
+
+      // --- Modal Handling ---
+      function setupModals() {
+        document.querySelectorAll('[data-dismiss="modal"]').forEach((btn) => {
+          btn.addEventListener("click", (e) =>
+            e.target.closest(".modal-overlay").classList.remove("active")
+          );
+        });
+      }
+
+      function showModal(modalId) {
+        document.getElementById(modalId).classList.add("active");
+      }
+
+      function hideModal(modalId) {
+        document.getElementById(modalId).classList.remove("active");
+      }
+
+      function showConfirmModal(title, message, confirmCallback, cancelCallback) {
+        const modal = document.getElementById("confirmModal");
+        modal.querySelector("#confirmModalLabel").textContent = title;
+        modal.querySelector("#confirmMessage").textContent = message;
+        const confirmBtn = modal.querySelector("#confirmActionBtn");
+        const cancelBtn = modal.querySelector(".btn-secondary[data-dismiss='modal']");
+
+        // Clone to remove previous event listeners
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+
+        newConfirmBtn.addEventListener("click", () => {
+          confirmCallback();
+          hideModal("confirmModal");
+        });
+        newCancelBtn.addEventListener("click", () => {
+          if (cancelCallback) cancelCallback();
+          hideModal("confirmModal");
+        });
+        showModal("confirmModal");
+      }
+
+      function showImageChangeModal(file) {
+        const modal = document.getElementById("imageChangeModal");
+        const saveAndChangeBtn = modal.querySelector("#saveAndChangeBtn");
+        const changeWithoutSavingBtn = modal.querySelector("#changeWithoutSavingBtn");
+        const cancelBtn = modal.querySelector(".btn-secondary[data-dismiss='modal']");
+
+        // Clone to remove previous event listeners
+        const newSaveAndChangeBtn = saveAndChangeBtn.cloneNode(true);
+        const newChangeWithoutSavingBtn = changeWithoutSavingBtn.cloneNode(true);
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        saveAndChangeBtn.parentNode.replaceChild(newSaveAndChangeBtn, saveAndChangeBtn);
+        changeWithoutSavingBtn.parentNode.replaceChild(newChangeWithoutSavingBtn, changeWithoutSavingBtn);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+
+
+        newSaveAndChangeBtn.addEventListener("click", () => {
+          saveAll();
+          loadImage(file);
+          hideModal("imageChangeModal");
+        });
+        newChangeWithoutSavingBtn.addEventListener("click", () => {
+          isSaved = true; // Mark as saved to bypass checks
+          loadImage(file);
+          hideModal("imageChangeModal");
+        });
+        newCancelBtn.addEventListener("click", () => {
+          hideModal("imageChangeModal");
+        });
+        showModal("imageChangeModal");
+      }
+
+      function showHistoryModal() {
+        const historyList = document.getElementById("historyList");
+        historyList.innerHTML = ""; // Clear previous list
+
+        if (sessionAnnotatedImages.length === 0) {
+          const listItem = document.createElement("li");
+          listItem.className = "list-group-item";
+          listItem.textContent = "Aucune image annotée dans cette session.";
+          historyList.appendChild(listItem);
+        } else {
+          sessionAnnotatedImages.forEach((imageName) => {
+            const listItem = document.createElement("li");
+            listItem.className = "list-group-item";
+            listItem.textContent = imageName;
+            listItem.style.cursor = "pointer"; // Indicate clickable
+            listItem.style.padding = "10px";
+            listItem.style.borderBottom = "1px solid rgba(255,255,255,0.1)";
+            listItem.style.color = "var(--color-text)";
+            listItem.style.transition = "background-color 0.2s ease";
+            listItem.addEventListener("mouseenter", () => {
+                listItem.style.backgroundColor = "rgba(255,255,255,0.05)";
+            });
+            listItem.addEventListener("mouseleave", () => {
+                listItem.style.backgroundColor = "transparent";
+            });
+            listItem.addEventListener("click", () => {
+              // Simulate file input change for loading from history
+              const imageInput = document.getElementById("imageInput");
+              // Create a dummy File object for consistency with loadImage
+              const dummyFile = new File([], imageName, { type: "image/png" }); // Type can be generic
+              dummyFile.isFromHistory = true; // Custom flag
+              loadImage(dummyFile); // Load the image by name
+              hideModal("historyModal");
+            });
+            historyList.appendChild(listItem);
+          });
+        }
+        showModal("historyModal");
+      }
+
+      function checkUnsavedChanges(callback) {
+        if (!isSaved && (annotations.length > 0 || maskPoints.length > 0)) {
+          showConfirmModal(
+            "Modifications non enregistrées",
+            "Vous avez des modifications non enregistrées. Voulez-vous enregistrer avant de continuer ?",
+            () => {
+              saveAll();
+              callback();
+            },
+            () => {
+              // User chose not to save, proceed anyway
+              isSaved = true; // Reset flag to avoid repeated prompts
+              callback();
+            }
+          );
+        } else {
+          callback();
         }
       }
 
-      window.addEventListener("resize", debounce(handleResize, 200));
-      setupEventHandlers();
+      // --- Canvas & Annotation Logic ---
+      function initializeCanvas(img) {
+        const container = document.querySelector(".canvas-area");
+        const maxWidth = container.clientWidth;
+        const maxHeight = container.clientHeight;
+        const scale = Math.min(maxWidth / img.width, maxHeight / img.height);
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        canvas.style.display = "block";
+        placeholder.style.display = "none";
+        redrawCanvas();
+        isSaved = true;
+        // Store current container size to detect resize changes
+        prevContainerSize = { width: container.clientWidth, height: container.clientHeight };
+      }
+
+      function loadImage(file) {
+        progressOverlay.classList.add("active");
+        if (!file || !file.type.startsWith("image/")) {
+          progressOverlay.classList.remove("active");
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.src = e.target.result;
+          img.onload = () => {
+            progressOverlay.classList.remove("active");
+
+            // Reset annotations for new image
+            annotations.length = 0;
+            undoneAnnotations.length = 0;
+            maskPoints = [];
+            isDrawing = false;
+            isSaved = true; // New image, no changes yet
+
+            image = {
+              file_name: file.name,
+              image: img,
+              id: imageIdCounter++,
+              height: img.height,
+              width: img.width,
+            };
+
+            initializeCanvas(img);
+            showAnnotations = true; // Always show annotations when new image is loaded
+            document.getElementById("toggleAnnotationsBtn").innerHTML = '<i class="fas fa-eye"></i>';
+
+            // If the image is loaded from history, make it view-only
+            isViewOnly = file.isFromHistory || false;
+            // Update button states if view-only
+            updateToolbarButtonsState();
+          };
+          img.onerror = () => {
+            progressOverlay.classList.remove("active");
+            console.error("Failed to load image.");
+          };
+        };
+        reader.onerror = () => {
+          progressOverlay.classList.remove("active");
+          console.error("FileReader error.");
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function redrawCanvas() {
+        if (!image) return;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(image.image, 0, 0, canvas.width, canvas.height);
+
+        const scaleX = canvas.width / image.width;
+        const scaleY = canvas.height / image.height;
+        const labelRects = []; // To prevent label overlaps
+
+        if (showAnnotations) {
+          annotations.forEach((anno) => {
+            const category = defaultCategories[anno.category_id];
+            if (!category) return; // Skip if category is not found
+
+            ctx.strokeStyle = category.color;
+            ctx.fillStyle = category.color.replace("rgb", "rgba").replace(")", ", 0.3)");
+            ctx.lineWidth = 2;
+
+            const maskPointsOriginal = convertSegmentationToPoints(anno.segmentation[0]);
+            const scaledMask = maskPointsOriginal.map(p => ({
+              x: p.x * scaleX,
+              y: p.y * scaleY,
+            }));
+
+            drawPolygon(scaledMask);
+            drawLabel(
+              category.displayName,
+              scaledMask,
+              category.id,
+              labelRects
+            );
+          });
+        }
+
+        // Draw temporary mask being drawn
+        if (isDrawing && maskPoints.length > 0 && !isViewOnly) {
+            ctx.strokeStyle = defaultCategories[currentCategory].color;
+            ctx.fillStyle = ctx.strokeStyle.replace("rgb", "rgba").replace(")", ", 0.3)");
+            ctx.lineWidth = 2;
+
+            ctx.beginPath();
+            maskPoints.forEach((point, i) => {
+                i === 0 ? ctx.moveTo(point.x, point.y) : ctx.lineTo(point.x, point.y);
+            });
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Draw points for visibility
+            ctx.fillStyle = defaultCategories[currentCategory].color;
+            maskPoints.forEach(point => {
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            // Highlight start point
+            if (maskPoints.length > 0) {
+                ctx.fillStyle = "red";
+                ctx.beginPath();
+                ctx.arc(maskPoints[0].x, maskPoints[0].y, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+      }
+
+      function drawPolygon(points, context = ctx) {
+        if (points.length < 2) return;
+        context.beginPath();
+        context.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length; i++) {
+          context.lineTo(points[i].x, points[i].y);
+        }
+        context.closePath();
+        context.fill();
+        context.stroke();
+      }
+
+
+      function drawLabel(text, maskPoints, categoryId, labelRects, context = ctx) {
+        const fontSize = 12;
+        context.font = `bold ${fontSize}px Inter`;
+        context.textBaseline = "bottom";
+        const metrics = context.measureText(text);
+        const padding = 4;
+        const labelWidth = metrics.width + padding * 4;
+        const labelHeight = fontSize + padding * 2;
+        const offset = 8; // Offset from mask
+
+        // Calculate centroid of the mask for initial label position
+        let centerX = 0, centerY = 0;
+        maskPoints.forEach(p => {
+            centerX += p.x;
+            centerY += p.y;
+        });
+        centerX /= maskPoints.length;
+        centerY /= maskPoints.length;
+
+        const maskBounds = {
+            minX: Math.min(...maskPoints.map(p => p.x)),
+            maxX: Math.max(...maskPoints.map(p => p.x)),
+            minY: Math.min(...maskPoints.map(p => p.y)),
+            maxY: Math.max(...maskPoints.map(p => p.y)),
+        };
+
+        // Try to place label above the mask first, then other positions
+        const candidates = [
+            { x: centerX - labelWidth / 2, y: maskBounds.minY - labelHeight - offset }, // Above
+            { x: centerX - labelWidth / 2, y: maskBounds.maxY + offset },             // Below
+            { x: maskBounds.minX - labelWidth - offset, y: centerY - labelHeight / 2 }, // Left
+            { x: maskBounds.maxX + offset, y: centerY - labelHeight / 2 },             // Right
+        ];
+
+        let labelX, labelY;
+        let foundPosition = false;
+
+        for (const candidate of candidates) {
+            const tempX = Math.max(padding, Math.min(candidate.x, canvas.width - labelWidth - padding));
+            const tempY = Math.max(padding, Math.min(candidate.y, canvas.height - labelHeight - padding));
+
+            const labelRect = {
+                x: tempX,
+                y: tempY,
+                width: labelWidth,
+                height: labelHeight,
+            };
+
+            const isOverlappingMask =
+                labelRect.x < maskBounds.maxX &&
+                labelRect.x + labelRect.width > maskBounds.minX &&
+                labelRect.y < maskBounds.maxY &&
+                labelRect.y + labelRect.height > maskBounds.minY;
+
+            const isOverlappingLabel = labelRects.some(
+                (existingRect) =>
+                    labelRect.x < existingRect.x + existingRect.width &&
+                    labelRect.x + labelRect.width > existingRect.x &&
+                    labelRect.y < existingRect.y + existingRect.height &&
+                    labelRect.y + labelRect.height > existingRect.y
+            );
+
+            if (!isOverlappingMask && !isOverlappingLabel) {
+                labelX = tempX;
+                labelY = tempY;
+                foundPosition = true;
+                labelRects.push(labelRect);
+                break;
+            }
+        }
+
+        // Fallback if no ideal position found (might overlap)
+        if (!foundPosition) {
+            labelX = Math.max(padding, Math.min(centerX - labelWidth / 2, canvas.width - labelWidth - padding));
+            labelY = Math.max(padding, Math.min(maskBounds.minY - labelHeight - offset, canvas.height - labelHeight - padding));
+            labelRects.push({ x: labelX, y: labelY, width: labelWidth, height: labelHeight });
+        }
+
+        context.fillStyle = "rgba(15, 15, 20, 0.7)"; // Use a consistent background for labels
+        context.fillRect(labelX, labelY, labelWidth, labelHeight);
+        context.fillStyle = defaultCategories[categoryId]?.color || "#ffffff"; // Text color matches category
+        context.fillText(text, labelX + padding * 2, labelY + fontSize + padding);
+      }
+
+
+      function finalizeMask() {
+        if (maskPoints.length < 3) {
+          maskPoints = [];
+          isDrawing = false;
+          redrawCanvas();
+          return;
+        }
+
+        // Convert canvas-scaled maskPoints back to original image coordinates
+        const scaleX = image.width / canvas.width;
+        const scaleY = image.height / canvas.height;
+        const originalImageMaskPoints = maskPoints.map(p => ({
+            x: p.x * scaleX,
+            y: p.y * scaleY
+        }));
+
+        const xs = originalImageMaskPoints.map((p) => p.x);
+        const ys = originalImageMaskPoints.map((p) => p.y);
+        const minX = Math.min(...xs);
+        const maxX = Math.max(...xs);
+        const minY = Math.min(...ys);
+        const maxY = Math.max(...ys);
+        const area = calculatePolygonArea(originalImageMaskPoints);
+
+        const segmentation = polygonToCocoFormat(originalImageMaskPoints);
+
+        annotations.push({
+          id: annotationIdCounter++, // Unique ID for each annotation
+          image_id: image.id,
+          category_id: currentCategory,
+          bbox: [minX, minY, maxX - minX, maxY - minY],
+          area: area,
+          segmentation: segmentation,
+          iscrowd: 0, // Assuming 0 for individual objects
+        });
+
+        maskPoints = [];
+        isDrawing = false;
+        undoneAnnotations = []; // Clear redo history on new annotation
+        redrawCanvas();
+        isSaved = false; // Mark as unsaved
+      }
+
+      function calculatePolygonArea(points) {
+        let area = 0;
+        for (let i = 0; i < points.length; i++) {
+          const j = (i + 1) % points.length;
+          area += points[i].x * points[j].y;
+          area -= points[j].x * points[i].y;
+        }
+        return Math.abs(area / 2);
+      }
+
+      function polygonToCocoFormat(maskPoints) {
+        const segmentation = [];
+        maskPoints.forEach((point) => {
+          segmentation.push(point.x);
+          segmentation.push(point.y);
+        });
+        return [segmentation]; // Array of arrays for COCO compatibility
+      }
+
+      function convertSegmentationToPoints(segmentation) {
+        const points = [];
+        for (let i = 0; i < segmentation.length; i += 2) {
+          points.push({
+            x: segmentation[i],
+            y: segmentation[i + 1],
+          });
+        }
+        return points;
+      }
+
+      function undoAnnotation() {
+        if (isViewOnly) return;
+        const lastAnnotation = annotations.pop();
+        if (lastAnnotation) {
+          undoneAnnotations.push(lastAnnotation);
+          redrawCanvas();
+          isSaved = false;
+        }
+      }
+
+      function redoAnnotation() {
+        if (isViewOnly) return;
+        const lastUndone = undoneAnnotations.pop();
+        if (lastUndone) {
+          annotations.push(lastUndone);
+          redrawCanvas();
+          isSaved = false;
+        }
+      }
+
+      function clearAllAnnotations() {
+        if (isViewOnly) return;
+        if (annotations.length === 0) return;
+
+        showConfirmModal(
+          "Supprimer toutes les annotations",
+          "Voulez-vous vraiment supprimer toutes les annotations ? Cette action est irréversible.",
+          () => {
+            annotations.forEach((anno) => undoneAnnotations.push(anno)); // Move to undo stack
+            annotations.length = 0;
+            maskPoints = [];
+            isDrawing = false;
+            redrawCanvas();
+            isSaved = false;
+          }
+        );
+      }
+
+      function selectCategory(categoryId) {
+        if (!defaultCategories[categoryId]) return; // Category must exist
+
+        currentCategory = categoryId;
+        document.querySelectorAll(".category-btn").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+        const button = document.getElementById(`cat${categoryId}`);
+        if (button) {
+          button.classList.add("active");
+        }
+        isSaved = false; // Selecting a category might lead to new drawings
+      }
+
+      function saveAll() {
+        if (!image) return;
+
+        // Create a temporary canvas for outputting the annotated image
+        const outputCanvas = document.createElement("canvas");
+        outputCanvas.width = image.width;
+        outputCanvas.height = image.height;
+        const outputCtx = outputCanvas.getContext("2d");
+
+        // Draw the original image on the output canvas
+        outputCtx.drawImage(image.image, 0, 0, image.width, image.height);
+
+        const labelRects = [];
+        // Draw all annotations and labels on the output canvas
+        annotations.forEach((anno) => {
+          const category = defaultCategories[anno.category_id];
+          if (!category) return;
+
+          outputCtx.strokeStyle = category.color;
+          outputCtx.fillStyle = category.color.replace("rgb", "rgba").replace(")", ", 0.2)");
+          outputCtx.lineWidth = 2;
+
+          const maskPointsOriginal = convertSegmentationToPoints(anno.segmentation[0]);
+          drawPolygon(maskPointsOriginal, outputCtx); // Draw mask on original resolution
+
+          drawLabel(
+            category.displayName,
+            maskPointsOriginal, // Pass original resolution points for label placement calculation
+            category.id,
+            labelRects,
+            outputCtx
+          );
+        });
+
+        const baseFileName = image.file_name.split(".")[0];
+        const outputFileName = `${baseFileName}_annotated`;
+
+        // Create JSON data for COCO format export
+        const imageForJson = {
+          file_name: image.file_name,
+          height: image.height,
+          width: image.width,
+          id: image.id,
+          // Add other COCO image properties if necessary (e.g., license, coco_url, date_captured)
+        };
+
+        const jsonData = {
+          images: [imageForJson],
+          annotations: annotations,
+          categories: Object.values(defaultCategories).map((cat) => ({
+            id: cat.id,
+            name: cat.name,
+            supercategory: cat.supercategory,
+          })),
+          info: { description: "Anatomy Annotator Dataset" },
+        };
+
+        // Download JSON file
+        const jsonStr = JSON.stringify(jsonData, null, 2);
+        const jsonBlob = new Blob([jsonStr], { type: "application/json" });
+        const jsonUrl = URL.createObjectURL(jsonBlob);
+        const jsonLink = document.createElement("a");
+        jsonLink.href = jsonUrl;
+        jsonLink.download = `${outputFileName}.json`;
+        jsonLink.click();
+        URL.revokeObjectURL(jsonUrl);
+
+        // Add to session history if not already present
+        if (!sessionAnnotatedImages.includes(image.file_name)) {
+          sessionAnnotatedImages.push(image.file_name);
+          localStorage.setItem("lastAnnotatedImage", JSON.stringify(sessionAnnotatedImages));
+        }
+
+        isSaved = true; // Mark as saved after successful save
+      }
+
+      function getTransformedPos(clientX, clientY) {
+        if (!image) return { x: 0, y: 0 };
+        const rect = canvas.getBoundingClientRect();
+        // Calculate image's actual rendered size and position within the canvas element
+        const imgRatio = image.width / image.height;
+        const canvasRatio = rect.width / rect.height;
+        let imgRenderedWidth, imgRenderedHeight, offsetX, offsetY;
+
+        if (imgRatio > canvasRatio) { // Image is wider than canvas area
+          imgRenderedWidth = rect.width;
+          imgRenderedHeight = imgRenderedWidth / imgRatio;
+          offsetX = 0;
+          offsetY = (rect.height - imgRenderedHeight) / 2;
+        } else { // Image is taller than canvas area
+          imgRenderedHeight = rect.height;
+          imgRenderedWidth = imgRenderedHeight * imgRatio;
+          offsetX = (rect.width - imgRenderedWidth) / 2;
+          offsetY = 0;
+        }
+
+        // Calculate position relative to the rendered image
+        const relX = clientX - rect.left - offsetX;
+        const relY = clientY - rect.top - offsetY;
+
+        // Check if cursor is outside the image area
+        if (relX < 0 || relX > imgRenderedWidth || relY < 0 || relY > imgRenderedHeight) {
+            return { x: -1, y: -1 }; // Indicate outside bounds
+        }
+
+        // Scale back to original image coordinates
+        const x = (relX / imgRenderedWidth) * image.width;
+        const y = (relY / imgRenderedHeight) * image.height;
+
+        return {
+          x: Math.max(0, Math.min(x, image.width)),
+          y: Math.max(0, Math.min(y, image.height)),
+        };
+      }
+
+
+      // --- Event Handlers ---
+      function handleTouchStart(e) {
+        e.preventDefault();
+        if (!image || isViewOnly) return;
+        const touch = e.touches[0];
+        const { x, y } = getTransformedPos(touch.clientX, touch.clientY);
+        if (x < 0 || y < 0) return; // Outside image bounds
+        if (e.touches.length === 1) {
+          isDrawing = true;
+          maskPoints = [{ x, y }];
+          redrawCanvas();
+        }
+      }
+
+      function handleTouchMove(e) {
+        e.preventDefault();
+        if (!image || isViewOnly || !isDrawing) return;
+        const touch = e.touches[0];
+        const { x, y } = getTransformedPos(touch.clientX, touch.clientY);
+        if (x < 0 || y < 0) return; // Outside image bounds
+
+        // Add point only if significantly moved to avoid too many points
+        const lastPoint = maskPoints[maskPoints.length - 1];
+        const distance = Math.sqrt(
+          (x - lastPoint.x) ** 2 + (y - lastPoint.y) ** 2
+        );
+        if (distance > 1) { // Only add if moved more than 1 pixel
+          maskPoints.push({ x, y });
+          redrawCanvas();
+        }
+      }
+
+      function handleTouchEnd(e) {
+        e.preventDefault(); // This is crucial for preventing phantom mouse events after touch
+        if (!image || isViewOnly || !isDrawing) return;
+        isDrawing = false;
+        finalizeMask();
+      }
+
+      function handleMouseDown(e) {
+        if (!image || isViewOnly || e.button !== 0) return; // Left click only
+        const { x, y } = getTransformedPos(e.clientX, e.clientY);
+        if (x < 0 || y < 0) return; // Outside image bounds
+        isDrawing = true;
+        maskPoints = [{ x, y }];
+        redrawCanvas();
+      }
+
+      function handleMouseMove(e) {
+        if (!image || isViewOnly || !isDrawing) return;
+        const { x, y } = getTransformedPos(e.clientX, e.clientY);
+        if (x < 0 || y < 0) return; // Outside image bounds
+
+        const lastPoint = maskPoints[maskPoints.length - 1];
+        const distance = Math.sqrt(
+          (x - lastPoint.x) ** 2 + (y - lastPoint.y) ** 2
+        );
+        if (distance > 1) { // Only add if moved more than 1 pixel
+          maskPoints.push({ x, y });
+          redrawCanvas();
+        }
+      }
+
+      function handleMouseUp(e) {
+        if (!image || isViewOnly || !isDrawing) return;
+        isDrawing = false;
+        finalizeMask();
+      }
+
+      function handleContextMenu(e) {
+        e.preventDefault(); // Prevent right-click menu
+      }
+
+      function updateToolbarButtonsState() {
+          const buttonsToDisable = ["undoBtn", "redoBtn", "clearAllBtn", "saveBtn"];
+          buttonsToDisable.forEach(id => {
+              const button = document.getElementById(id);
+              if (button) {
+                  button.disabled = isViewOnly;
+                  button.classList.toggle("disabled", isViewOnly);
+              }
+          });
+          // Category buttons should also be disabled in view-only mode
+          document.querySelectorAll(".category-btn").forEach(button => {
+              button.disabled = isViewOnly;
+              button.classList.toggle("disabled", isViewOnly);
+          });
+      }
+
+
+      function setupCanvasEventListeners() {
+        // Remove existing listeners to prevent duplicates
+        canvas.removeEventListener("touchstart", handleTouchStart);
+        canvas.removeEventListener("touchmove", handleTouchMove);
+        canvas.removeEventListener("touchend", handleTouchEnd);
+        canvas.removeEventListener("mousedown", handleMouseDown);
+        canvas.removeEventListener("mousemove", handleMouseMove);
+        canvas.removeEventListener("mouseup", handleMouseUp);
+        canvas.removeEventListener("contextmenu", handleContextMenu);
+        canvas.removeEventListener("mouseleave", handleMouseUp); // Ensure drawing stops if mouse leaves
+
+        if (!isViewOnly) {
+          canvas.addEventListener("touchstart", handleTouchStart, { passive: false });
+          canvas.addEventListener("touchmove", handleTouchMove, { passive: false });
+          canvas.addEventListener("touchend", handleTouchEnd, { passive: false });
+          canvas.addEventListener("mousedown", handleMouseDown);
+          canvas.addEventListener("mousemove", handleMouseMove);
+          canvas.addEventListener("mouseup", handleMouseUp);
+          canvas.addEventListener("mouseleave", handleMouseUp); // Stop drawing if mouse leaves canvas
+          canvas.addEventListener("contextmenu", handleContextMenu);
+        }
+        updateToolbarButtonsState(); // Update buttons based on view-only state
+      }
+
+      function toggleAnnotations() {
+        showAnnotations = !showAnnotations;
+        const toggleBtn = document.getElementById("toggleAnnotationsBtn");
+        toggleBtn.innerHTML = showAnnotations
+          ? '<i class="fas fa-eye"></i>'
+          : '<i class="fas fa-eye-slash"></i>';
+        toggleBtn.classList.toggle("active", showAnnotations); // Keep active state
+        redrawCanvas();
+      }
+
+
+      // --- Main Setup ---
+      document.addEventListener("DOMContentLoaded", () => {
+        setupConstellationBackground();
+        setupModals();
+
+        // Initialize tooltips (if using Bootstrap's built-in tooltips)
+        document.querySelectorAll('[data-tooltip]').forEach(element => {
+          element.setAttribute('title', element.dataset.tooltip);
+          // Simple custom tooltip logic, Bootstrap JS not linked
+          element.addEventListener('mouseenter', function() {
+            const tooltipText = this.getAttribute('data-tooltip');
+            let tooltipDiv = document.createElement('div');
+            tooltipDiv.className = 'custom-tooltip'; // Add a class for styling
+            tooltipDiv.textContent = tooltipText;
+            document.body.appendChild(tooltipDiv);
+            const rect = this.getBoundingClientRect();
+            tooltipDiv.style.left = `${rect.left + rect.width / 2 - tooltipDiv.offsetWidth / 2}px`;
+            tooltipDiv.style.top = `${rect.top - tooltipDiv.offsetHeight - 5}px`;
+            tooltipDiv.style.position = 'fixed';
+            tooltipDiv.style.zIndex = '9999';
+            tooltipDiv.style.backgroundColor = '#1a1a1a';
+            tooltipDiv.style.color = '#fff';
+            tooltipDiv.style.padding = '4px 8px';
+            tooltipDiv.style.borderRadius = '4px';
+            tooltipDiv.style.fontSize = '0.75rem';
+            tooltipDiv.style.whiteSpace = 'nowrap';
+            tooltipDiv.style.opacity = '0';
+            tooltipDiv.style.transition = 'opacity 0.2s';
+            setTimeout(() => tooltipDiv.style.opacity = '1', 10); // Fade in
+            this._tooltipDiv = tooltipDiv; // Store reference
+          });
+          element.addEventListener('mouseleave', function() {
+            if (this._tooltipDiv) {
+              this._tooltipDiv.style.opacity = '0';
+              this._tooltipDiv.addEventListener('transitionend', () => {
+                this._tooltipDiv.remove();
+                this._tooltipDiv = null;
+              }, {once: true});
+            }
+          });
+        });
+
+
+        // Global Event Listeners
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && maskPoints.length > 0 && !isViewOnly) {
+            maskPoints = [];
+            isDrawing = false;
+            redrawCanvas();
+          }
+        });
+
+        window.addEventListener("resize", debounce(() => {
+          if (image) {
+            // Re-initialize canvas only if container size has actually changed significantly
+            const container = document.querySelector(".canvas-area");
+            const currentSize = {
+              width: container.clientWidth,
+              height: container.clientHeight,
+            };
+            if (
+              Math.abs(currentSize.width - prevContainerSize.width) > 1 ||
+              Math.abs(currentSize.height - prevContainerSize.height) > 1
+            ) {
+              initializeCanvas(image.image);
+              prevContainerSize = currentSize;
+            }
+          }
+          // Also resize background canvas
+          if (constellationCanvas) {
+            constellationCanvas.width = window.innerWidth;
+            constellationCanvas.height = window.innerHeight;
+          }
+        }, 200));
+
+
+        // Drag & Drop for canvas-wrapper
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+          wrapper.addEventListener(eventName, e => {
+            e.preventDefault();
+            e.stopPropagation();
+          }, false);
+        });
+
+        wrapper.addEventListener('drop', e => {
+          const dt = e.dataTransfer;
+          const files = dt.files;
+          if (files.length > 0) {
+            if (!isSaved && (annotations.length > 0 || maskPoints.length > 0)) {
+              showImageChangeModal(files[0]);
+            } else {
+              loadImage(files[0]);
+            }
+          }
+        }, false);
+
+
+        // --- Button Click Handlers ---
+        document
+          .getElementById("newImageBtn")
+          .addEventListener("click", () => {
+            const imageInput = document.getElementById("imageInput");
+            // Always trigger the file input click, but check for unsaved changes first
+            if (!isSaved && (annotations.length > 0 || maskPoints.length > 0)) {
+                showImageChangeModal(imageInput.files[0]); // Pass current file if any
+            } else {
+                imageInput.value = ''; // Clear previous selection for change event to fire
+                imageInput.click();
+            }
+          });
+
+        document
+          .getElementById("imageInput")
+          .addEventListener("change", (e) => loadImage(e.target.files[0]));
+
+        document
+          .getElementById("saveBtn")
+          .addEventListener("click", debounce(saveAll, 1000)); // Debounce save to prevent multiple clicks
+
+        document
+          .getElementById("historyBtn")
+          .addEventListener("click", showHistoryModal);
+
+        document
+          .getElementById("toggleAnnotationsBtn")
+          .addEventListener("click", toggleAnnotations);
+
+        document
+          .getElementById("undoBtn")
+          .addEventListener("click", undoAnnotation);
+
+        document
+          .getElementById("redoBtn")
+          .addEventListener("click", redoAnnotation);
+
+        document
+          .getElementById("clearAllBtn")
+          .addEventListener("click", clearAllAnnotations);
+
+        document
+          .getElementById("backBtn")
+          .addEventListener("click", () => checkUnsavedChanges(() => window.location.href = "index.html"));
+
+        document
+          .getElementById("tutorialBtn")
+          .addEventListener("click", () => showModal("tutorialModal"));
+
+
+        document.querySelectorAll(".category-btn").forEach((button) => {
+          button.addEventListener("click", () =>
+            selectCategory(parseInt(button.dataset.category))
+          );
+        });
+
+        // Initialize default category
+        selectCategory(currentCategory);
+        document.getElementById("toggleAnnotationsBtn").classList.add("active"); // Set active by default
+
+        // Show tutorial on first load
+        if (!localStorage.getItem("tutorialShown")) {
+          showModal("tutorialModal");
+        }
+
+        document.getElementById("dontShowAgain").addEventListener("change", (e) => {
+            if (e.target.checked) {
+                localStorage.setItem("tutorialShown", "true");
+            } else {
+                localStorage.removeItem("tutorialShown");
+            }
+        });
+
+        // Setup canvas listeners after initial setup
+        setupCanvasEventListeners();
+      });
     </script>
   </body>
 </html>
