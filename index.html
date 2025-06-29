@@ -45,7 +45,8 @@
         --gradient-primary: linear-gradient(135deg, #ff7d12, #fb3aa2, #2997ff);
         --glow-color: rgba(251, 58, 162, 0.3);
         --border-color-hover: #fb3aa2;
-        --glass-bg: rgba(15, 15, 20, 0.5);
+        /* Mis à jour pour un noir visuellement complet avec une légère transparence */
+        --glass-bg: rgba(0, 0, 0, 0.98);
         --glass-blur: blur(12px);
         --border-color: rgba(255, 255, 255, 0.1);
       }
@@ -143,18 +144,37 @@
         justify-content: center;
         margin: 2rem auto;
         width: fit-content;
-        background: var(--glass-bg);
-        backdrop-filter: var(--glass-blur);
-        border: 1px solid var(--border-color);
         border-radius: 16px;
         box-shadow: 0 8px 32px var(--glow-color);
-        padding: 2rem 1.5rem;
         gap: 1.8rem;
-        animation: fadeInUp 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards 0.6s; /* Ajustement de l'animation */
+        animation: fadeInUp 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards 0.6s;
         user-select: none;
         position: relative;
         z-index: 2;
-        opacity: 0; /* Assure que la section est invisible au début */
+        opacity: 0;
+
+        /* Technique de bordure dégradée */
+        background-image: var(
+          --gradient-primary
+        ); /* Le dégradé pour la bordure */
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+        padding: 2px; /* Définit l'épaisseur de la bordure dégradée */
+      }
+
+      /* Div interne pour le fond réel du contenu */
+      .select-section-inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: var(--glass-bg); /* Applique le fond en verre/noir ici */
+        backdrop-filter: var(--glass-blur); /* Applique le flou ici */
+        border-radius: 14px; /* Légèrement plus petit pour s'adapter à la bordure de 2px */
+        padding: calc(2rem - 2px) calc(1.5rem - 2px); /* Ajuste le padding pour compenser la bordure */
+        gap: 1.8rem;
+        height: 100%; /* S'assure qu'il remplit le parent */
+        width: 100%; /* S'assure qu'il remplit le parent */
       }
 
       .specialty-btn {
@@ -283,7 +303,10 @@
 
       @media (max-width: 480px) {
         .select-section {
-          padding: 1.5rem 1rem;
+          padding: 2px; /* C'est l'épaisseur de la bordure */
+        }
+        .select-section-inner {
+          padding: calc(1.5rem - 2px) calc(1rem - 2px); /* Ajuste le padding interne */
           gap: 1.2rem;
         }
       }
@@ -322,34 +345,37 @@
       role="main"
       aria-label="Sélection de la spécialité chirurgicale"
     >
-      <button
-        class="specialty-btn"
-        data-specialty="digestive"
-        aria-label="Chirurgie digestive - disponible"
-      >
-        Chirurgie digestive
-      </button>
-      <button
-        class="specialty-btn"
-        disabled
-        aria-label="Chirurgie cardiaque - bientôt disponible"
-      >
-        Chirurgie cardiaque
-      </button>
-      <button
-        class="specialty-btn"
-        disabled
-        aria-label="Chirurgie vasculaire - bientôt disponible"
-      >
-        Chirurgie vasculaire
-      </button>
-      <button
-        class="specialty-btn"
-        disabled
-        aria-label="Chirurgie thoracique - bientôt disponible"
-      >
-        Chirurgie thoracique
-      </button>
+      <!-- Conteneur interne pour le contenu et l'arrière-plan en verre -->
+      <div class="select-section-inner">
+        <button
+          class="specialty-btn"
+          data-specialty="digestive"
+          aria-label="Chirurgie digestive - disponible"
+        >
+          Chirurgie digestive
+        </button>
+        <button
+          class="specialty-btn"
+          disabled
+          aria-label="Chirurgie cardiaque - bientôt disponible"
+        >
+          Chirurgie cardiaque
+        </button>
+        <button
+          class="specialty-btn"
+          disabled
+          aria-label="Chirurgie vasculaire - bientôt disponible"
+        >
+          Chirurgie vasculaire
+        </button>
+        <button
+          class="specialty-btn"
+          disabled
+          aria-label="Chirurgie thoracique - bientôt disponible"
+        >
+          Chirurgie thoracique
+        </button>
+      </div>
     </section>
 
     <footer>© 2025 Anatomy Annotator – Tous droits réservés.</footer>

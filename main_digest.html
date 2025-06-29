@@ -6,6 +6,8 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
+    <title>Anatomy Annotator</title>
+    <!-- Métadonnées et icônes -->
     <meta name="theme-color" content="#0A1A3A" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta
@@ -18,24 +20,32 @@
     />
     <link
       rel="apple-touch-icon"
-      href="Group 15.png"
+      href="https://placehold.co/180x180/0A1A3A/FFFFFF?text=AA"
       sizes="180x180"
       type="image/png"
     />
-    <link rel="icon" href="Group 15.png" sizes="48x48" type="image/png" />
-    <title>Anatomy Annotator</title>
     <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-      rel="stylesheet"
-      crossorigin="anonymous"
+      rel="icon"
+      href="https://placehold.co/48x48/0A1A3A/FFFFFF?text=AA"
+      sizes="48x48"
+      type="image/png"
     />
+
+    <!-- Polices et icônes -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+      rel="stylesheet"
+      crossorigin="anonymous"
+    />
+
     <style>
+      /* --- Variables CSS Globales --- */
       :root {
         --color-background: #000000;
         --color-text: #eaeaea;
@@ -48,12 +58,12 @@
         --border-color: rgba(255, 255, 255, 0.1);
       }
 
+      /* --- Réinitialisation et Styles de Base --- */
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
       }
-
       html,
       body {
         height: 100vh;
@@ -65,16 +75,15 @@
         -webkit-tap-highlight-color: transparent;
       }
 
+      /* --- Arrière-plan Animé --- */
       #constellation-canvas {
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        inset: 0;
         z-index: -1;
         opacity: 0.6;
       }
 
+      /* --- En-tête --- */
       .top-header {
         position: fixed;
         top: 15px;
@@ -82,22 +91,20 @@
         z-index: 10;
         font-size: 0.9rem;
         font-weight: 600;
-      }
-
-      .top-header .brand {
-        font-weight: 400;
         color: var(--color-text-muted);
+        display: flex;
+        align-items: center;
+        gap: 10px;
       }
-
       .top-header .app-title {
         background-image: var(--gradient-primary);
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
-        display: inline-block;
         font-weight: 600;
       }
 
+      /* --- Conteneur Principal --- */
       .main-container {
         display: flex;
         gap: 1.5rem;
@@ -108,6 +115,7 @@
         justify-content: center;
       }
 
+      /* --- Colonne du Canvas --- */
       .canvas-column {
         flex-grow: 1;
         display: flex;
@@ -115,84 +123,8 @@
         gap: 1rem;
         height: 100%;
         max-width: 1200px;
+        min-height: 0;
       }
-
-      .toolbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.6rem;
-        background: var(--glass-bg);
-        backdrop-filter: var(--glass-blur);
-        border: 1px solid var(--border-color);
-        border-radius: 16px;
-      }
-
-      .toolbar-group {
-        display: flex;
-        gap: 0.6rem;
-      }
-
-      .toolbar-btn {
-        width: 42px;
-        height: 42px;
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid var(--border-color);
-        color: #ffffff; /* Icônes en blanc pur par défaut */
-        font-size: 1.1rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .toolbar-btn:hover {
-        color: #ffffff; /* Blanc pur au survol */
-        border-color: var(--border-color-hover);
-        background: rgba(255, 255, 255, 0.1);
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px var(--glow-color);
-      }
-      .toolbar-btn.active {
-        background-image: var(--gradient-primary);
-        color: #ffffff; /* Blanc pur quand actif */
-        border-color: transparent;
-        box-shadow: 0 0 15px var(--glow-color);
-      }
-      .toolbar-btn.disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        pointer-events: none;
-      }
-
-      /* Remplacement spécifique pour le bouton Afficher/Masquer */
-      #toggleAnnotationsBtn.active {
-        background-image: none; /* Supprime le dégradé */
-        background-color: rgba(255, 255, 255, 0.1); /* Remplissage subtil */
-        color: #ffffff; /* Blanc pur */
-        border-color: rgba(
-          255,
-          255,
-          255,
-          0.2
-        ); /* Bordure légèrement plus prononcée */
-        box-shadow: none;
-      }
-
-      /* Style pour les boutons Annuler, Refaire, Supprimer avec blur */
-      .bottom-toolbar .toolbar-btn {
-        background: rgba(15, 15, 20, 0.7); /* Plus opaque */
-        backdrop-filter: blur(15px); /* Plus de blur */
-        border: 1px solid rgba(255, 255, 255, 0.15); /* Bordure légère */
-      }
-      .bottom-toolbar .toolbar-btn:hover {
-        background: rgba(15, 15, 20, 0.9);
-        border-color: var(--border-color-hover);
-        box-shadow: 0 5px 15px var(--glow-color);
-      }
-
       .canvas-wrapper {
         flex-grow: 1;
         position: relative;
@@ -202,10 +134,8 @@
         border-radius: 16px;
         padding: 0.75rem;
         display: flex;
-        flex-direction: column;
         min-height: 0;
       }
-
       .canvas-area {
         position: relative;
         width: 100%;
@@ -216,24 +146,20 @@
         align-items: center;
         justify-content: center;
       }
-
       #canvas {
         max-width: 100%;
         max-height: 100%;
         cursor: crosshair;
         display: none;
-        touch-action: none; /* Empêche le défilement et le zoom par défaut sur les appareils tactiles */
+        touch-action: none;
       }
-
       #noImagePlaceholder {
-        width: 100%;
-        height: 100%;
+        text-align: center;
+        color: var(--color-text-muted);
         display: flex;
         flex-direction: column;
-        align-items: center;
         justify-content: center;
-        color: var(--color-text-muted);
-        border-radius: 8px;
+        align-items: center;
       }
       #noImagePlaceholder h5 {
         font-size: 1.1rem;
@@ -242,6 +168,53 @@
         margin-bottom: 0.5rem;
       }
 
+      /* --- Barres d'outils --- */
+      .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.6rem;
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+      }
+      .toolbar-group {
+        display: flex;
+        gap: 0.6rem;
+        align-items: center; /* Alignement vertical pour le badge */
+      }
+      .toolbar-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-color);
+        color: #ffffff;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .toolbar-btn:hover {
+        border-color: var(--border-color-hover);
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px var(--glow-color);
+      }
+      .toolbar-btn.active {
+        background-image: var(--gradient-primary);
+        color: #ffffff;
+        border-color: transparent;
+        box-shadow: 0 0 15px var(--glow-color);
+      }
+      .toolbar-btn.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
       .bottom-toolbar {
         position: absolute;
         bottom: 1.5rem;
@@ -251,7 +224,22 @@
         gap: 0.75rem;
         z-index: 5;
       }
+      .read-only-badge {
+        background-color: #ffcc00;
+        color: #333;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.7em;
+        font-weight: 700;
+        display: none;
+        align-items: center;
+        gap: 5px;
+      }
+      .read-only-badge.active {
+        display: flex;
+      }
 
+      /* --- Panneau de Catégories --- */
       .category-panel {
         display: flex;
         flex-direction: column;
@@ -264,7 +252,6 @@
         width: 260px;
         flex-shrink: 0;
       }
-
       .category-btn {
         font-family: "Inter", sans-serif;
         font-weight: 500;
@@ -274,81 +261,46 @@
         padding: 0.8rem 1.2rem;
         border-radius: 10px;
         background-color: rgba(255, 255, 255, 0.05);
-        background-image: none;
         border: 1px solid var(--border-color);
         cursor: pointer;
         transition: all 0.2s ease;
       }
-
       .category-btn:hover {
         transform: translateY(-2px);
         filter: brightness(1.2);
         border-color: rgba(255, 255, 255, 0.2);
       }
-
       .category-btn.active {
         color: white;
         border-color: transparent;
         box-shadow: 0 0 15px var(--glow-color);
-        transform: translateY(0);
-        filter: none;
       }
-      .category-btn.disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        pointer-events: none;
-      }
-
-      /* Couleurs spécifiques pour chaque catégorie active */
+      /* Couleurs spécifiques par catégorie */
       #cat3.active {
-        background-image: linear-gradient(
-          135deg,
-          rgb(255, 0, 0),
-          rgb(200, 0, 0)
-        ); /* Rouge pour Artère */
+        background-image: linear-gradient(135deg, #ff3333, #cc0000);
       }
       #cat4.active {
-        background-image: linear-gradient(
-          135deg,
-          rgb(0, 128, 0),
-          rgb(0, 100, 0)
-        ); /* Vert pour Canal */
+        background-image: linear-gradient(135deg, #33cc33, #008000);
       }
       #cat5.active {
-        background-image: linear-gradient(
-          135deg,
-          rgb(217, 119, 6),
-          rgb(173, 95, 5)
-        ); /* Orange existant pour Vésicule */
+        background-image: linear-gradient(135deg, #027541, #005a32);
       }
       #cat7.active {
-        background-image: linear-gradient(
-          135deg,
-          rgb(148, 0, 211),
-          rgb(118, 0, 168)
-        ); /* Violet existant pour Foie */
+        background-image: linear-gradient(135deg, #9f33ff, #7e00d1);
       }
       #cat6.active {
-        background-image: linear-gradient(
-          135deg,
-          rgb(128, 128, 128),
-          rgb(100, 100, 100)
-        ); /* Gris pour Outil */
+        background-image: linear-gradient(135deg, #b3b3b3, #808080);
       }
       #cat8.active {
-        background-image: linear-gradient(
-          135deg,
-          rgb(255, 255, 0),
-          rgb(200, 200, 0)
-        ); /* Jaune pour Voie Biliaire */
+        background-image: linear-gradient(135deg, #ff9933, #d97506);
       }
 
-      /* Modals */
+      /* --- Modales --- */
       .modal-overlay {
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.8); /* Opacité augmentée */
-        backdrop-filter: blur(20px); /* Flou augmenté */
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(8px); /* Blur réduit */
         z-index: 1000;
         display: flex;
         align-items: center;
@@ -361,6 +313,11 @@
         opacity: 1;
         pointer-events: all;
       }
+      /* Assurez-vous que confirmModal est au-dessus de tout le reste */
+      #confirmModal.modal-overlay,
+      #imageChangeModal.modal-overlay {
+        z-index: 1002;
+      }
       .modal-content {
         background: var(--glass-bg);
         border: 1px solid var(--border-color);
@@ -371,6 +328,9 @@
         transform: scale(0.95);
         transition: transform 0.3s ease;
         color: var(--color-text);
+        display: flex;
+        flex-direction: column;
+        max-height: 80vh;
       }
       .modal-overlay.active .modal-content {
         transform: scale(1);
@@ -380,10 +340,27 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 1rem;
+        flex-shrink: 0;
       }
       .modal-title {
         font-size: 1.2rem;
         font-weight: 600;
+      }
+      .modal-body {
+        margin-bottom: 1.5rem;
+        color: var(--color-text-muted);
+        line-height: 1.6;
+        overflow-y: auto;
+        flex-grow: 1;
+      }
+      .modal-body strong {
+        color: var(--color-text);
+      }
+      .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        flex-shrink: 0;
       }
       .btn-close {
         background: none;
@@ -397,20 +374,6 @@
       .btn-close:hover {
         opacity: 1;
       }
-      .modal-body {
-        margin-bottom: 1.5rem;
-        color: var(--color-text-muted);
-        line-height: 1.6;
-      }
-      .modal-body strong {
-        color: var(--color-text);
-      }
-      .modal-footer {
-        display: flex;
-        justify-content: flex-end;
-        gap: 0.75rem;
-      }
-
       .btn {
         padding: 0.6rem 1.2rem;
         border-radius: 8px;
@@ -422,7 +385,6 @@
       .btn-primary {
         background-image: var(--gradient-primary);
         color: white;
-        border: none;
       }
       .btn-primary:hover {
         filter: brightness(1.2);
@@ -437,23 +399,116 @@
         background: rgba(255, 255, 255, 0.15);
       }
 
-      /* Progress Indicator */
+      /* Styles de l'historique amélioré */
+      #historyList {
+        list-style: none;
+        padding: 0;
+      }
+      .history-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 10px;
+        border-bottom: 1px solid var(--border-color);
+        cursor: pointer;
+        transition: background-color 0.2s;
+        border-radius: 8px;
+      }
+      .history-item:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+      .history-item-thumbnail {
+        width: 80px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 6px;
+        flex-shrink: 0;
+      }
+      .history-item-info {
+        flex-grow: 1;
+        font-size: 0.9rem;
+      }
+      .history-item-info span {
+        display: block;
+      }
+      .history-item-info .filename {
+        font-weight: 600;
+        color: var(--color-text);
+      }
+      .history-item-info .details {
+        font-size: 0.8rem;
+      }
+      .history-item-delete {
+        color: var(--color-text-muted);
+        cursor: pointer;
+        transition: color 0.2s;
+        font-size: 1rem;
+        padding: 5px;
+      }
+      .history-item-delete:hover {
+        color: #ff5555;
+      }
+
+      /* Message d'info/erreur général */
+      .message-box {
+        position: fixed;
+        top: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        z-index: 1003; /* Au-dessus des modales */
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s, visibility 0.3s;
+        font-size: 0.9rem;
+        text-align: center;
+      }
+      .message-box.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      /* Message d'absence d'annotations (nouveau style) */
+      .no-annotation-message {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.7); /* Fond semi-transparent foncé */
+        backdrop-filter: blur(5px); /* Fond flou */
+        color: white;
+        padding: 20px 30px;
+        border-radius: 12px;
+        font-size: 1.5rem; /* Police plus grande */
+        font-weight: bold;
+        text-align: center;
+        pointer-events: none; /* Permet aux clics de passer à travers si besoin */
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s, visibility 0.3s;
+        z-index: 50; /* Au-dessus du canvas mais en dessous des modales principales */
+      }
+      .no-annotation-message.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      /* --- Indicateur de Progression --- */
       .progress-overlay {
         position: fixed;
         inset: 0;
         background: rgba(0, 0, 0, 0.7);
         backdrop-filter: blur(4px);
         z-index: 1001;
-        display: flex;
+        display: none;
         align-items: center;
         justify-content: center;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s ease;
       }
       .progress-overlay.active {
-        opacity: 1;
-        pointer-events: all;
+        display: flex;
       }
       .progress-spinner {
         border: 4px solid rgba(255, 255, 255, 0.3);
@@ -464,15 +519,12 @@
         animation: spin 1s linear infinite;
       }
       @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
         100% {
           transform: rotate(360deg);
         }
       }
 
-      /* Responsive */
+      /* --- Responsive --- */
       @media (max-width: 1024px) {
         .main-container {
           flex-direction: column;
@@ -509,9 +561,9 @@
           padding: 0.4rem;
         }
         .toolbar-btn {
-          width: 36px;
-          height: 36px;
-          font-size: 0.9rem;
+          width: 38px;
+          height: 38px;
+          font-size: 1rem;
         }
         .category-panel {
           padding: 0.75rem;
@@ -531,7 +583,6 @@
   </head>
   <body>
     <canvas id="constellation-canvas"></canvas>
-
     <div class="top-header">
       <span class="app-title">Anatomy Annotator</span>
       <span class="brand">by Vioo AI</span>
@@ -542,13 +593,22 @@
     </div>
 
     <div class="main-container">
+      <!-- Colonne principale avec le canvas et les outils -->
       <div class="canvas-column">
-        <div class="toolbar" id="toolbar">
+        <div class="toolbar">
           <div class="toolbar-group">
-            <button class="toolbar-btn" id="newImageBtn" title="Charger">
+            <button
+              class="toolbar-btn"
+              id="newImageBtn"
+              title="Charger une image"
+            >
               <i class="fas fa-download"></i>
             </button>
-            <button class="toolbar-btn" id="saveBtn" title="Enregistrer">
+            <button
+              class="toolbar-btn"
+              id="saveBtn"
+              title="Enregistrer les annotations"
+            >
               <i class="fas fa-save"></i>
             </button>
             <button class="toolbar-btn" id="historyBtn" title="Historique">
@@ -557,10 +617,13 @@
             <button
               class="toolbar-btn"
               id="toggleAnnotationsBtn"
-              title="Afficher/Masquer"
+              title="Afficher/Masquer les annotations"
             >
               <i class="fas fa-eye"></i>
             </button>
+            <span class="read-only-badge" id="readOnlyBadge">
+              <i class="fas fa-lock"></i> LECTURE SEULE
+            </span>
           </div>
           <div class="toolbar-group">
             <button class="toolbar-btn" id="tutorialBtn" title="Aide">
@@ -573,27 +636,31 @@
         </div>
 
         <div class="canvas-wrapper">
+          <div id="noAnnotationMessage" class="no-annotation-message">
+            Pas d'annotations. Dessinez pour enregistrer !
+          </div>
           <div class="canvas-area">
             <div id="noImagePlaceholder">
               <h5>Prêt à disséquer ?</h5>
-              <p>Utilisez le bouton "Charger" pour importer une image.</p>
+              <p>Chargez une image pour commencer.</p>
             </div>
             <canvas id="canvas"></canvas>
           </div>
           <div class="bottom-toolbar">
-            <button class="toolbar-btn" id="undoBtn" title="Annuler">
+            <button class="toolbar-btn" id="undoBtn" title="Annuler (Ctrl+Z)">
               <i class="fas fa-undo"></i>
             </button>
-            <button class="toolbar-btn" id="redoBtn" title="Refaire">
+            <button class="toolbar-btn" id="redoBtn" title="Refaire (Ctrl+Y)">
               <i class="fas fa-redo"></i>
             </button>
-            <button class="toolbar-btn" id="clearAllBtn" title="Supprimer">
+            <button class="toolbar-btn" id="clearAllBtn" title="Tout effacer">
               <i class="fas fa-trash"></i>
             </button>
           </div>
         </div>
       </div>
 
+      <!-- Panneau des catégories -->
       <div class="category-panel">
         <button class="category-btn" id="cat3" data-category="3">
           Artère Cystique
@@ -612,43 +679,42 @@
       </div>
     </div>
 
-    <input
-      type="file"
-      id="imageInput"
-      accept="image/jpeg,image/png,image/gif"
-      style="display: none"
-    />
+    <!-- Input caché pour le chargement de fichier -->
+    <input type="file" id="imageInput" accept="image/*" style="display: none" />
 
-    <!-- Modals -->
+    <!-- Modales -->
     <div class="modal-overlay" id="tutorialModal">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Instructions</h5>
-          <button type="button" class="btn-close" data-dismiss="modal">
-            &times;
-          </button>
+          <button class="btn-close" data-dismiss="modal">&times;</button>
         </div>
         <div class="modal-body">
           <p>
-            <strong>1. Charger :</strong> Importez votre image via le bouton
-            <i class="fas fa-download"></i>.
+            <strong>1. Charger :</strong> Importez une image via
+            <i class="fas fa-download"></i> ou par glisser-déposer.
           </p>
           <p>
-            <strong>2. Choisir :</strong> Sélectionnez une structure anatomique
-            dans le panneau de droite.
+            <strong>2. Choisir :</strong> Sélectionnez une catégorie
+            d'annotation sur la droite.
           </p>
           <p>
             <strong>3. Annoter :</strong> Maintenez le clic ou le toucher pour
-            dessiner. Relâchez pour finaliser.
+            dessiner le contour. Relâchez pour finaliser.
           </p>
           <p>
-            <strong>4. Sauvegarder :</strong> Enregistrez vos annotations via le
-            bouton <i class="fas fa-save"></i>.
+            <strong>4. Gérer :</strong> Utilisez les outils
+            <i class="fas fa-undo"></i>, <i class="fas fa-redo"></i>, et
+            <i class="fas fa-trash"></i> pour modifier vos annotations.
+          </p>
+          <p>
+            <strong>5. Sauvegarder :</strong> Enregistrez votre travail via
+            <i class="fas fa-save"></i>.
           </p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" data-dismiss="modal">
-            C'est parti
+          <button class="btn btn-primary" data-dismiss="modal">
+            Compris !
           </button>
         </div>
       </div>
@@ -658,18 +724,14 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="confirmModalLabel">Confirmation</h5>
-          <button type="button" class="btn-close" data-dismiss="modal">
-            &times;
-          </button>
+          <button class="btn-close" data-dismiss="modal">&times;</button>
         </div>
-        <div class="modal-body">
-          <p id="confirmMessage"></p>
-        </div>
+        <div class="modal-body"><p id="confirmMessage"></p></div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          <button class="btn btn-secondary" data-dismiss="modal">
             Annuler
           </button>
-          <button type="button" class="btn btn-primary" id="confirmActionBtn">
+          <button class="btn btn-primary" id="confirmActionBtn">
             Confirmer
           </button>
         </div>
@@ -679,31 +741,23 @@
     <div class="modal-overlay" id="imageChangeModal">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="imageChangeModalLabel">
-            Changer d'image
-          </h5>
-          <button type="button" class="btn-close" data-dismiss="modal">
-            &times;
-          </button>
+          <h5 class="modal-title">Changer d'image</h5>
+          <button class="btn-close" data-dismiss="modal">&times;</button>
         </div>
         <div class="modal-body">
           <p>
-            Voulez-vous enregistrer vos annotations avant de charger une
-            nouvelle image ?
+            Voulez-vous enregistrer les annotations actuelles avant de continuer
+            ?
           </p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          <button class="btn btn-secondary" data-dismiss="modal">
             Annuler
           </button>
-          <button type="button" class="btn btn-primary" id="saveAndChangeBtn">
+          <button class="btn btn-primary" id="saveAndChangeBtn">
             Enregistrer et changer
           </button>
-          <button
-            type="button"
-            class="btn btn-primary"
-            id="changeWithoutSavingBtn"
-          >
+          <button class="btn btn-primary" id="changeWithoutSavingBtn">
             Changer sans enregistrer
           </button>
         </div>
@@ -713,1346 +767,831 @@
     <div class="modal-overlay" id="historyModal">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="historyModalLabel">
-            Historique des images annotées
-          </h5>
-          <button type="button" class="btn-close" data-dismiss="modal">
-            &times;
-          </button>
+          <h5 class="modal-title">Historique des annotations</h5>
+          <button class="btn-close" data-dismiss="modal">&times;</button>
         </div>
-        <div class="modal-body">
-          <ul class="list-group" id="historyList"></ul>
-        </div>
+        <div class="modal-body"><ul id="historyList"></ul></div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">
-            Fermer
+          <button class="btn btn-secondary" id="clearHistoryBtn">
+            Vider l'historique
           </button>
+          <button class="btn btn-primary" data-dismiss="modal">Fermer</button>
         </div>
       </div>
     </div>
 
     <script>
-      // Variables globales de l'application
-      const canvas = document.getElementById("canvas");
-      const ctx = canvas.getContext("2d", { willReadFrequently: true });
-      const placeholder = document.getElementById("noImagePlaceholder");
-      const constellationCanvas = document.getElementById(
-        "constellation-canvas"
-      );
-      const canvasArea = document.querySelector(".canvas-area");
-      const progressOverlay = document.getElementById("progressOverlay");
-
-      let image = null; // L'objet Image chargé
-      const annotations = []; // Tableau des annotations
-      let undoneAnnotations = []; // Historique des annotations annulées
-      let currentCategory = 3; // Catégorie d'annotation sélectionnée
-      // maskPoints stocke désormais les coordonnées des points du masque RELATIVEMENT à la zone de l'image dessinée sur le canevas
-      let maskPoints = [];
-      let isDrawing = false; // Indicateur si l'utilisateur est en train de dessiner
-      let showAnnotations = true; // Indicateur d'affichage des annotations
-      let isSaved = true; // Indicateur si les modifications sont enregistrées
-      let isViewOnly = false; // Mode lecture seule (pour les images chargées depuis l'historique)
-
-      // Informations sur la façon dont l'image est actuellement rendue sur le canevas interne
-      // Inclut la position (x,y) et la taille (width, height) de l'image dessinée sur le canevas,
-      // tenant compte de object-fit: contain
-      let currentImageRenderInfo = { x: 0, y: 0, width: 0, height: 0 };
-
-      // Catégories d'annotation prédéfinies avec les nouvelles couleurs
-      const defaultCategories = {
-        3: {
-          id: 3,
-          name: "cystic_artery",
-          color: "rgb(255, 0, 0)", // Rouge pour Artère
-          supercategory: "anatomy",
-          displayName: "Artère Cystique",
-        },
-        4: {
-          id: 4,
-          name: "cystic_duct",
-          color: "rgb(0, 128, 0)", // Vert pour Canal
-          supercategory: "anatomy",
-          displayName: "Canal Cystique",
-        },
-        5: {
-          id: 5,
-          name: "gallbladder",
-          color: "rgb(217, 119, 6)", // Orange existant pour Vésicule
-          supercategory: "anatomy",
-          displayName: "Vésicule Biliaire",
-        },
-        7: {
-          id: 7,
-          name: "liver",
-          color: "rgb(148, 0, 211)", // Violet existant pour Foie
-          supercategory: "anatomy",
-          displayName: "Foie",
-        },
-        6: {
-          id: 6,
-          name: "tool",
-          color: "rgb(128, 128, 128)", // Gris pour Outil
-          supercategory: "tool",
-          displayName: "Outil",
-        },
-        8: {
-          id: 8,
-          name: "common_bile_duct",
-          color: "rgb(255, 255, 0)", // Jaune pour Voie Biliaire Principale
-          supercategory: "anatomy",
-          displayName: "Voie Biliaire Principale",
-        },
-      };
-
-      // --- Fonctions utilitaires ---
-
-      // Empêche l'exécution répétée rapide d'une fonction
-      function debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-          const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-          };
-          clearTimeout(timeout);
-          timeout = setTimeout(later, wait);
+      document.addEventListener("DOMContentLoaded", () => {
+        // --- SÉLECTEURS DU DOM ---
+        // Centralisation de tous les éléments DOM pour un accès plus rapide et un code plus court.
+        const els = {
+          canvas: document.getElementById("canvas"),
+          placeholder: document.getElementById("noImagePlaceholder"),
+          constellationCanvas: document.getElementById("constellation-canvas"),
+          progressOverlay: document.getElementById("progressOverlay"),
+          imageInput: document.getElementById("imageInput"),
+          readOnlyBadge: document.getElementById("readOnlyBadge"),
+          noAnnotationMessage: document.getElementById("noAnnotationMessage"),
+          tutorialModal: document.getElementById("tutorialModal"),
+          confirmModal: document.getElementById("confirmModal"),
+          imageChangeModal: document.getElementById("imageChangeModal"),
+          historyModal: document.getElementById("historyModal"),
+          confirmModalLabel: document.getElementById("confirmModalLabel"),
+          confirmMessage: document.getElementById("confirmMessage"),
+          confirmActionBtn: document.getElementById("confirmActionBtn"),
+          saveAndChangeBtn: document.getElementById("saveAndChangeBtn"),
+          changeWithoutSavingBtn: document.getElementById(
+            "changeWithoutSavingBtn"
+          ),
+          historyList: document.getElementById("historyList"),
+          clearHistoryBtn: document.getElementById("clearHistoryBtn"),
+          newImageBtn: document.getElementById("newImageBtn"),
+          saveBtn: document.getElementById("saveBtn"),
+          historyBtn: document.getElementById("historyBtn"),
+          toggleAnnotationsBtn: document.getElementById("toggleAnnotationsBtn"),
+          tutorialBtn: document.getElementById("tutorialBtn"),
+          undoBtn: document.getElementById("undoBtn"),
+          redoBtn: document.getElementById("redoBtn"),
+          clearAllBtn: document.getElementById("clearAllBtn"),
         };
-      }
 
-      // --- Fond d'écran Constellation ---
-      function setupConstellationBackground() {
-        if (!constellationCanvas) return;
-        const bgCtx = constellationCanvas.getContext("2d");
-        let stars = [];
-        let animationFrameId;
+        const ctx = els.canvas.getContext("2d", { willReadFrequently: true });
+        const canvasArea = document.querySelector(".canvas-area");
 
-        const setup = () => {
-          constellationCanvas.width = window.innerWidth;
-          constellationCanvas.height = window.innerHeight;
-          stars = [];
-          let starCount = Math.min(
-            150,
-            (window.innerWidth * window.innerHeight) / 10000
-          );
-          for (let i = 0; i < starCount; i++) {
-            stars.push({
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
-              radius: Math.random() * 1.6 + 0.8,
-              vx: (Math.random() - 0.5) * 0.1,
-              vy: (Math.random() - 0.5) * 0.1,
-              opacity: Math.random() * 0.6 + 0.3,
+        // --- ÉTAT GLOBAL DE L'APPLICATION ---
+        let image = null;
+        const annotations = [];
+        let undoneAnnotations = [];
+        let currentCategory = 3;
+        let maskPoints = [];
+        let isDrawing = false;
+        let showAnnotations = true;
+        let isSaved = true;
+        let isViewOnly = false;
+        let currentImageRenderInfo = { x: 0, y: 0, width: 0, height: 0 };
+
+        const CATEGORIES = {
+          3: {
+            id: 3,
+            name: "cystic_artery",
+            color: "rgb(255, 51, 51)",
+            supercategory: "anatomy",
+            displayName: "Artère Cystique",
+          },
+          4: {
+            id: 4,
+            name: "cystic_duct",
+            color: "rgb(51, 204, 51)",
+            supercategory: "anatomy",
+            displayName: "Canal Cystique",
+          },
+          5: {
+            id: 5,
+            name: "gallbladder",
+            color: "rgb(0, 90, 50)",
+            supercategory: "anatomy",
+            displayName: "Vésicule Biliaire",
+          },
+          6: {
+            id: 6,
+            name: "tool",
+            color: "rgb(179, 179, 179)",
+            supercategory: "tool",
+            displayName: "Outil",
+          },
+          7: {
+            id: 7,
+            name: "liver",
+            color: "rgb(159, 51, 255)",
+            supercategory: "anatomy",
+            displayName: "Foie",
+          },
+          8: {
+            id: 8,
+            name: "common_bile_duct",
+            color: "rgb(255, 153, 51)",
+            supercategory: "anatomy",
+            displayName: "Voie Biliaire Principale",
+          },
+        };
+
+        // --- FONCTIONS UTILITAIRES ---
+        const debounce = (func, wait) => {
+          let timeout;
+          return (...args) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+          };
+        };
+
+        const setProgress = (active) =>
+          els.progressOverlay.classList.toggle("active", active);
+
+        const showNoAnnotationMessage = (duration = 3000) => {
+          els.noAnnotationMessage.classList.add("active");
+          setTimeout(() => {
+            els.noAnnotationMessage.classList.remove("active");
+          }, duration);
+        };
+
+        // --- ARRIÈRE-PLAN ANIMÉ ---
+        // La logique d'arrière-plan animée est déjà encapsulée et ne nécessite pas de modifications d'optimisation supplémentaires.
+        (() => {
+          const bgCtx = els.constellationCanvas.getContext("2d");
+          let stars = [],
+            animationFrameId;
+
+          const setup = () => {
+            els.constellationCanvas.width = window.innerWidth;
+            els.constellationCanvas.height = window.innerHeight;
+            stars = [];
+            const starCount = Math.min(
+              150,
+              (window.innerWidth * window.innerHeight) / 10000
+            );
+            for (let i = 0; i < starCount; i++) {
+              stars.push({
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                radius: Math.random() * 1.6 + 0.8,
+                vx: (Math.random() - 0.5) * 0.1,
+                vy: (Math.random() - 0.5) * 0.1,
+                opacity: Math.random() * 0.6 + 0.3,
+              });
+            }
+          };
+          const draw = () => {
+            bgCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            stars.forEach((star) => {
+              bgCtx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+              bgCtx.beginPath();
+              bgCtx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+              bgCtx.fill();
+              star.x += star.vx;
+              star.y += star.vy;
+              if (star.x < 0 || star.x > window.innerWidth) star.vx *= -1;
+              if (star.y < 0 || star.y > window.innerHeight) star.vy *= -1;
             });
+            animationFrameId = requestAnimationFrame(draw);
+          };
+          window.addEventListener("resize", debounce(setup, 200));
+          setup();
+          draw();
+        })();
+
+        // --- GESTION DES MODALES ---
+        const setupModals = () => {
+          document.querySelectorAll('[data-dismiss="modal"]').forEach((btn) => {
+            btn.addEventListener("click", () =>
+              btn.closest(".modal-overlay").classList.remove("active")
+            );
+          });
+        };
+        const toggleModal = (modalId, show) =>
+          document.getElementById(modalId).classList.toggle("active", show);
+
+        const showConfirmModal = (title, message, confirmCallback) => {
+          els.confirmModalLabel.textContent = title;
+          els.confirmMessage.textContent = message;
+          const confirmBtn = els.confirmActionBtn;
+          // Clonage du bouton pour supprimer les anciens écouteurs d'événements et éviter les déclenchements multiples.
+          const newConfirmBtn = confirmBtn.cloneNode(true);
+          confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+          newConfirmBtn.addEventListener(
+            "click",
+            () => {
+              confirmCallback();
+              toggleModal("confirmModal", false);
+            },
+            { once: true } // L'écouteur est automatiquement supprimé après un seul déclenchement.
+          );
+          toggleModal("confirmModal", true);
+        };
+
+        // --- GESTION DE L'HISTORIQUE ---
+        const getHistory = () =>
+          JSON.parse(localStorage.getItem("annotatedImageHistory")) || [];
+        const saveHistory = (history) => {
+          // Limite l'historique aux 10 dernières entrées pour optimiser le stockage.
+          if (history.length > 10) history = history.slice(-10);
+          localStorage.setItem(
+            "annotatedImageHistory",
+            JSON.stringify(history)
+          );
+        };
+        const deleteHistoryEntry = (timestamp) => {
+          showConfirmModal(
+            "Supprimer l'entrée",
+            "Voulez-vous vraiment supprimer cette entrée de l'historique ?",
+            () => {
+              let history = getHistory().filter(
+                (item) => item.timestamp !== timestamp
+              );
+              saveHistory(history);
+              showHistoryModal(); // Rafraîchit l'affichage de la modale après suppression.
+            }
+          );
+        };
+        const clearAllHistory = () => {
+          showConfirmModal(
+            "Vider l'historique",
+            "Voulez-vous vraiment supprimer tout l'historique ? Cette action est irréversible.",
+            () => {
+              localStorage.removeItem("annotatedImageHistory");
+              showHistoryModal(); // Rafraîchit l'affichage de la modale après vidage.
+            }
+          );
+        };
+        const showHistoryModal = () => {
+          els.historyList.innerHTML = "";
+          const history = getHistory();
+          els.clearHistoryBtn.style.display =
+            history.length > 0 ? "block" : "none";
+
+          if (history.length === 0) {
+            els.historyList.innerHTML =
+              "<li>Aucune image dans l'historique.</li>";
+          } else {
+            // Afficher les éléments les plus récents en premier.
+            history.reverse().forEach((entry) => {
+              const li = document.createElement("li");
+              li.className = "history-item";
+              li.innerHTML = `
+                        <img src="${
+                          entry.imageData
+                        }" class="history-item-thumbnail" alt="Aperçu"/>
+                        <div class="history-item-info">
+                            <span class="filename">${entry.fileName}</span>
+                            <span class="details">${
+                              entry.annotations.length
+                            } annotation(s) - ${new Date(
+                entry.timestamp
+              ).toLocaleString()}</span>
+                        </div>
+                        <i class="fas fa-trash history-item-delete" title="Supprimer cette entrée"></i>
+                    `;
+              li.querySelector(".history-item-delete").addEventListener(
+                "click",
+                (e) => {
+                  e.stopPropagation(); // Empêche l'événement de clic du li de se déclencher.
+                  deleteHistoryEntry(entry.timestamp);
+                }
+              );
+              li.addEventListener("click", () =>
+                checkUnsavedChanges(() => {
+                  loadImageFromHistory(entry);
+                  toggleModal("historyModal", false);
+                })
+              );
+              els.historyList.appendChild(li);
+            });
+          }
+          toggleModal("historyModal", true);
+        };
+
+        // --- LOGIQUE DU CANVAS ET DES ANNOTATIONS ---
+        const updateUIState = () => {
+          const hasImage = !!image;
+          // Les outils d'annotation sont désactivés en mode lecture seule.
+          const canAnnotate = hasImage && !isViewOnly;
+
+          els.canvas.style.display = hasImage ? "block" : "none";
+          els.placeholder.style.display = hasImage ? "none" : "flex";
+
+          // Contrôle l'état des boutons liés à l'annotation et à la sauvegarde.
+          ["undoBtn", "redoBtn", "clearAllBtn", "saveBtn"].forEach((id) => {
+            const btn = els[id];
+            btn.disabled = !canAnnotate;
+            btn.classList.toggle("disabled", !canAnnotate);
+          });
+          // Contrôle l'état des boutons de catégorie.
+          document.querySelectorAll(".category-btn").forEach((btn) => {
+            btn.disabled = !canAnnotate;
+            btn.classList.toggle("disabled", !canAnnotate);
+          });
+
+          // Affiche ou masque le badge "LECTURE SEULE".
+          els.readOnlyBadge.classList.toggle("active", isViewOnly);
+
+          // Si en mode lecture seule, désélectionne toute catégorie active.
+          if (isViewOnly) {
+            document
+              .querySelectorAll(".category-btn.active")
+              .forEach((b) => b.classList.remove("active"));
+          } else if (hasImage) {
+            // Sinon, sélectionne la catégorie actuelle si une image est chargée.
+            selectCategory(currentCategory);
           }
         };
 
-        const draw = () => {
-          if (!bgCtx) return;
-          bgCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-          stars.forEach((star) => {
-            bgCtx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
-            bgCtx.beginPath();
-            bgCtx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-            bgCtx.fill();
-            star.x += star.vx;
-            star.y += star.vy;
-            if (star.x < 0 || star.x > window.innerWidth) star.vx *= -1;
-            if (star.y < 0 || star.y > window.innerHeight) star.vy *= -1;
-          });
-          animationFrameId = requestAnimationFrame(draw);
-        };
-
-        if (animationFrameId) {
-          cancelAnimationFrame(animationFrameId);
-        }
-        setup();
-        draw();
-      }
-
-      // --- Gestion des modales ---
-      function setupModals() {
-        document.querySelectorAll('[data-dismiss="modal"]').forEach((btn) => {
-          btn.addEventListener("click", (e) =>
-            e.target.closest(".modal-overlay").classList.remove("active")
-          );
-        });
-      }
-
-      function showModal(modalId) {
-        document.getElementById(modalId).classList.add("active");
-      }
-
-      function hideModal(modalId) {
-        document.getElementById(modalId).classList.remove("active");
-      }
-
-      function showConfirmModal(
-        title,
-        message,
-        confirmCallback,
-        cancelCallback
-      ) {
-        const modal = document.getElementById("confirmModal");
-        modal.querySelector("#confirmModalLabel").textContent = title;
-        modal.querySelector("#confirmMessage").textContent = message;
-        const confirmBtn = modal.querySelector("#confirmActionBtn");
-        const cancelBtn = modal.querySelector(
-          ".btn-secondary[data-dismiss='modal']"
-        );
-
-        // Cloner pour supprimer les listeners précédents et éviter les doublons
-        const newConfirmBtn = confirmBtn.cloneNode(true);
-        const newCancelBtn = cancelBtn.cloneNode(true);
-        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
-
-        newConfirmBtn.addEventListener("click", () => {
-          confirmCallback();
-          hideModal("confirmModal");
-        });
-        newCancelBtn.addEventListener("click", () => {
-          if (cancelCallback) cancelCallback();
-          hideModal("confirmModal");
-        });
-        showModal("confirmModal");
-      }
-
-      function showImageChangeModal(file) {
-        const modal = document.getElementById("imageChangeModal");
-        const saveAndChangeBtn = modal.querySelector("#saveAndChangeBtn");
-        const changeWithoutSavingBtn = modal.querySelector(
-          "#changeWithoutSavingBtn"
-        );
-        const cancelBtn = modal.querySelector(
-          ".btn-secondary[data-dismiss='modal']"
-        );
-
-        const newSaveAndChangeBtn = saveAndChangeBtn.cloneNode(true);
-        const newChangeWithoutSavingBtn =
-          changeWithoutSavingBtn.cloneNode(true);
-        const newCancelBtn = cancelBtn.cloneNode(true);
-        saveAndChangeBtn.parentNode.replaceChild(
-          newSaveAndChangeBtn,
-          saveAndChangeBtn
-        );
-        changeWithoutSavingBtn.parentNode.replaceChild(
-          newChangeWithoutSavingBtn,
-          changeWithoutSavingBtn
-        );
-        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
-
-        newSaveAndChangeBtn.addEventListener("click", () => {
-          saveAll(); // Sauvegarde les annotations actuelles
-          loadImage(file); // Puis charge la nouvelle image
-          hideModal("imageChangeModal");
-        });
-        newChangeWithoutSavingBtn.addEventListener("click", () => {
-          isSaved = true; // Marque comme enregistré pour éviter les vérifications pour la nouvelle image
-          annotations.length = 0; // Efface les annotations si non sauvegardées
-          undoneAnnotations.length = 0;
-          maskPoints = [];
-          isDrawing = false;
-          loadImage(file); // Charge la nouvelle image sans sauvegarder
-          hideModal("imageChangeModal");
-        });
-        newCancelBtn.addEventListener("click", () => {
-          hideModal("imageChangeModal");
-        });
-        showModal("imageChangeModal");
-      }
-
-      function showHistoryModal() {
-        const historyList = document.getElementById("historyList");
-        historyList.innerHTML = ""; // Efface la liste précédente
-
-        const storedHistory = localStorage.getItem("annotatedImageHistory");
-        let history = storedHistory ? JSON.parse(storedHistory) : [];
-
-        if (history.length === 0) {
-          const listItem = document.createElement("li");
-          listItem.className = "list-group-item";
-          listItem.textContent = "Aucune image annotée dans l'historique.";
-          historyList.appendChild(listItem);
-        } else {
-          // Affiche l'historique par ordre chronologique inverse (plus récent en premier)
-          history.reverse().forEach((historyEntry) => {
-            const listItem = document.createElement("li");
-            listItem.className = "list-group-item";
-            const date = new Date(historyEntry.timestamp).toLocaleString();
-            listItem.textContent = `${historyEntry.fileName} (${date})`;
-            listItem.style.cursor = "pointer";
-            listItem.style.padding = "10px";
-            listItem.style.borderBottom = "1px solid rgba(255,255,255,0.1)";
-            listItem.style.color = "var(--color-text)";
-            listItem.style.transition = "background-color 0.2s ease";
-            listItem.addEventListener("mouseenter", () => {
-              listItem.style.backgroundColor = "rgba(255,255,255,0.05)";
-            });
-            listItem.addEventListener("mouseleave", () => {
-              listItem.style.backgroundColor = "transparent";
-            });
-            listItem.addEventListener("click", () => {
-              // Vérifie les changements non sauvegardés avant de charger depuis l'historique
-              checkUnsavedChanges(() => {
-                loadImageFromHistory(historyEntry);
-                hideModal("historyModal");
-              });
-            });
-            historyList.appendChild(listItem);
-          });
-        }
-        showModal("historyModal");
-      }
-
-      // Vérifie si des modifications non sauvegardées existent
-      function checkUnsavedChanges(callback) {
-        if (!isSaved && image) {
-          showConfirmModal(
-            "Modifications non enregistrées",
-            "Vous avez des modifications non enregistrées. Voulez-vous enregistrer avant de continuer ?",
-            () => {
-              saveAll();
-              setTimeout(callback, 500); // Laisse un court instant pour la sauvegarde
-            },
-            () => {
-              isSaved = true; // L'utilisateur a choisi de ne pas sauvegarder, on continue
-              callback();
-            }
-          );
-        } else {
-          callback();
-        }
-      }
-
-      // --- Logique du canevas et des annotations ---
-
-      // Initialise la taille du canevas pour s'adapter à la zone et y dessiner l'image
-      function initializeCanvas() {
-        if (!image || !canvasArea) return;
-
-        // Définir la résolution interne du canevas pour correspondre aux dimensions du conteneur
-        const containerWidth = canvasArea.clientWidth;
-        const containerHeight = canvasArea.clientHeight;
-
-        canvas.width = containerWidth;
-        canvas.height = containerHeight;
-        canvas.style.display = "block";
-        placeholder.style.display = "none";
-
-        redrawCanvas();
-        isSaved = true; // L'image vient d'être chargée, pas encore de modifications
-      }
-
-      // Charge une image depuis un fichier sélectionné par l'utilisateur
-      function loadImage(file) {
-        progressOverlay.classList.add("active");
-        if (!file || !file.type || !file.type.startsWith("image/")) {
-          progressOverlay.classList.remove("active");
-          console.error("Fichier non valide ou non-image.");
-          return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const imgElement = new Image();
-          imgElement.src = e.target.result;
-          imgElement.onload = () => {
-            progressOverlay.classList.remove("active");
-
-            // Réinitialise les annotations pour la nouvelle image (sauf si c'est un rechargement d'historique)
-            if (!file.isFromHistory) {
-              annotations.length = 0;
-              undoneAnnotations.length = 0;
-              maskPoints = [];
-              isDrawing = false;
-              isSaved = true;
-            }
-
-            image = {
-              file_name: file.name,
-              dataURL: e.target.result, // Stocke le DataURL pour recharger depuis l'historique
-              image: imgElement,
-              id: Date.now(), // ID unique basé sur le timestamp
-              height: imgElement.height,
-              width: imgElement.width,
-              annotationIndex: 0, // Initialise l'index des annotations pour cette image
-            };
-
-            initializeCanvas();
-            showAnnotations = true; // Affiche toujours les annotations pour une nouvelle image
-            // document.getElementById("toggleAnnotationsBtn").innerHTML =
-            //   '<i class="fas fa-eye"></i>';
-            // document
-            //   .getElementById("toggleAnnotationsBtn")
-            //   .classList.add("active"); // Removed to prevent default active state
-
-            isViewOnly = file.isFromHistory || false; // Définit le mode lecture seule si vient de l'historique
-            updateToolbarButtonsState(); // Met à jour l'état des boutons
-            setupCanvasEventListeners(); // Réinitialise les écouteurs d'événements du canevas
-          };
-          imgElement.onerror = () => {
-            progressOverlay.classList.remove("active");
-            console.error("Échec du chargement de l'image.");
-          };
-        };
-        reader.onerror = () => {
-          progressOverlay.classList.remove("active");
-          console.error("Erreur du FileReader.");
-        };
-        reader.readAsDataURL(file);
-      }
-
-      // Charge une image et ses annotations depuis l'historique
-      function loadImageFromHistory(historyEntry) {
-        const imgElement = new Image();
-        imgElement.src = historyEntry.imageData;
-        imgElement.onload = () => {
-          image = {
-            file_name: historyEntry.fileName,
-            dataURL: historyEntry.imageData,
-            image: imgElement,
-            id: historyEntry.imageId,
-            height: imgElement.height,
-            width: imgElement.width,
-            annotationIndex: 0, // Initialize here
-          };
-
-          // Efface les annotations actuelles et charge celles de l'historique
+        const resetStateForNewImage = () => {
           annotations.length = 0;
           undoneAnnotations.length = 0;
-          if (historyEntry.annotations) {
-            historyEntry.annotations.forEach((anno) => {
-              // Handle potential stringified segmentation from older saves
-              if (typeof anno.segmentation[0] === "string") {
-                try {
-                  anno.segmentation[0] = JSON.parse(anno.segmentation[0]);
-                } catch (e) {
-                  console.error(
-                    "Error parsing segmentation string from history:",
-                    e,
-                    anno.segmentation[0]
-                  );
-                  anno.segmentation[0] = []; // Fallback to empty array on parse error
-                }
-              }
-            });
-            annotations.push(...historyEntry.annotations);
-
-            // Correctly set annotationIndex for the image based on loaded annotations
-            if (annotations.length > 0) {
-              // Find the maximum 'annotationIndex' part from the loaded IDs
-              // The structure is id = image.id * 10 + local_annotation_index
-              // So, local_annotation_index = id % 10
-              const maxLocalAnnoIndex = annotations.reduce((max, anno) => {
-                // Make sure anno.id is a number before using modulo
-                const currentAnnoIdx =
-                  typeof anno.id === "number" ? anno.id % 10 : -1;
-                return Math.max(max, currentAnnoIdx);
-              }, -1); // Start with -1 so if only 0 exists, it becomes 0 + 1 = 1
-
-              image.annotationIndex = maxLocalAnnoIndex + 1;
-            } else {
-              image.annotationIndex = 0; // If no annotations loaded, start from 0
-            }
-          }
-
-          isViewOnly = true;
-          isSaved = true;
           maskPoints = [];
           isDrawing = false;
-
-          initializeCanvas();
-          updateToolbarButtonsState();
-          setupCanvasEventListeners();
-        };
-        imgElement.onerror = () => {
-          console.error("Échec du chargement de l'image depuis l'historique.");
-        };
-      }
-
-      // Redessine l'image et toutes les annotations sur le canevas
-      function redrawCanvas() {
-        if (!image) return;
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Calcule les dimensions réelles de dessin de l'image sur le canevas (object-fit: contain)
-        const imgAspectRatio = image.width / image.height;
-        const canvasAspectRatio = canvas.width / canvas.height;
-
-        let drawWidth, drawHeight, drawX, drawY;
-
-        if (imgAspectRatio > canvasAspectRatio) {
-          // L'image est plus large, on la fait correspondre à la largeur du canevas
-          drawWidth = canvas.width;
-          drawHeight = canvas.width / imgAspectRatio;
-          drawX = 0;
-          drawY = (canvas.height - drawHeight) / 2;
-        } else {
-          // L'image est plus haute ou a le même ratio, on la fait correspondre à la hauteur
-          drawHeight = canvas.height;
-          drawWidth = canvas.height * imgAspectRatio;
-          drawX = (canvas.width - drawWidth) / 2;
-          drawY = 0;
-        }
-
-        // Stocke ces informations pour la conversion des coordonnées
-        currentImageRenderInfo = {
-          x: drawX,
-          y: drawY,
-          width: drawWidth,
-          height: drawHeight,
+          isSaved = true;
+          isViewOnly = false; // Réinitialise le mode lecture seule.
         };
 
-        // Dessine l'image avec les dimensions calculées
-        ctx.drawImage(image.image, drawX, drawY, drawWidth, drawHeight);
+        const loadImage = (file) => {
+          if (!file || !file.type.startsWith("image/")) return;
+          setProgress(true);
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const imgElement = new Image();
+            imgElement.onload = () => {
+              // Création d'un canvas temporaire pour redimensionner l'image
+              const tempCanvas = document.createElement("canvas");
+              const tempCtx = tempCanvas.getContext("2d");
+              const targetWidth = 854;
+              const targetHeight = 480;
 
-        const labelRects = []; // Pour éviter le chevauchement des étiquettes
+              tempCanvas.width = targetWidth;
+              tempCanvas.height = targetHeight;
 
-        if (showAnnotations) {
-          annotations.forEach((anno) => {
-            const category = defaultCategories[anno.category_id];
-            if (!category) return;
+              // Dessine l'image originale sur le canvas temporaire avec les nouvelles dimensions
+              tempCtx.drawImage(imgElement, 0, 0, targetWidth, targetHeight);
 
-            ctx.strokeStyle = category.color;
-            ctx.fillStyle = category.color
-              .replace("rgb", "rgba")
-              .replace(")", ", 0.3)");
-            ctx.lineWidth = 2;
+              // Récupère la Data URL de l'image redimensionnée
+              const resizedDataURL = tempCanvas.toDataURL(file.type);
 
-            // Convertit les points de segmentation d'origine en points scalés pour le canevas actuel
-            const maskPointsOriginal = convertSegmentationToPoints(
-              anno.segmentation[0]
-            );
-            const scaledMask = maskPointsOriginal.map((p) => ({
-              x: p.x * (drawWidth / image.width) + drawX,
-              y: p.y * (drawHeight / image.height) + drawY,
-            }));
-
-            drawPolygon(scaledMask);
-            drawLabel(
-              category.displayName,
-              scaledMask, // Utilise les points scalés pour le placement de l'étiquette
-              category.id,
-              labelRects
-            );
-          });
-        }
-
-        // Dessine le masque temporaire en cours de création
-        if (isDrawing && maskPoints.length > 0 && !isViewOnly) {
-          ctx.strokeStyle = defaultCategories[currentCategory].color;
-          // Contours seulement pendant le dessin
-          ctx.lineWidth = 2;
-
-          ctx.beginPath();
-          maskPoints.forEach((point, i) => {
-            const displayX = point.x + currentImageRenderInfo.x; // Applique l'offset
-            const displayY = point.y + currentImageRenderInfo.y; // Applique l'offset
-            i === 0
-              ? ctx.moveTo(displayX, displayY)
-              : ctx.lineTo(displayX, displayY);
-          });
-          ctx.closePath();
-          ctx.stroke(); // Dessine le contour
-
-          // Dessine les points pour une meilleure visibilité
-          ctx.fillStyle = defaultCategories[currentCategory].color;
-          maskPoints.forEach((point) => {
-            const displayX = point.x + currentImageRenderInfo.x; // Applique l'offset
-            const displayY = point.y + currentImageRenderInfo.y; // Applique l'offset
-            ctx.beginPath();
-            ctx.arc(displayX, displayY, 3, 0, Math.PI * 2);
-            ctx.fill();
-          });
-          // Met en évidence le point de départ
-          if (maskPoints.length > 0) {
-            const displayX = maskPoints[0].x + currentImageRenderInfo.x; // Applique l'offset
-            const displayY = maskPoints[0].y + currentImageRenderInfo.y; // Applique l'offset
-            ctx.fillStyle = "red";
-            ctx.beginPath();
-            ctx.arc(displayX, displayY, 5, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        }
-      }
-
-      // Dessine un polygone sur le canevas
-      function drawPolygon(points, context = ctx) {
-        if (points.length < 2) return;
-        context.beginPath();
-        context.moveTo(points[0].x, points[0].y);
-        for (let i = 1; i < points.length; i++) {
-          context.lineTo(points[i].x, points[i].y);
-        }
-        context.closePath();
-        context.fill();
-        context.stroke();
-      }
-
-      // Dessine une étiquette de texte près de l'annotation
-      function drawLabel(
-        text,
-        maskPoints,
-        categoryId,
-        labelRects,
-        context = ctx
-      ) {
-        const fontSize = 12;
-        context.font = `bold ${fontSize}px Inter`;
-        context.textBaseline = "bottom";
-        const metrics = context.measureText(text);
-        const padding = 4;
-        const labelWidth = metrics.width + padding * 4;
-        const labelHeight = fontSize + padding * 2;
-        const offset = 8; // Décalage par rapport au masque
-
-        // Calcule le centre du masque pour la position initiale de l'étiquette
-        let minX = Infinity,
-          maxX = -Infinity,
-          minY = Infinity,
-          maxY = -Infinity;
-        maskPoints.forEach((p) => {
-          minX = Math.min(minX, p.x);
-          maxX = Math.max(maxX, p.x);
-          minY = Math.min(minY, p.y);
-          maxY = Math.max(maxY, p.y);
-        });
-
-        const maskBounds = { minX, maxX, minY, maxY };
-
-        // Essaye de placer l'étiquette au-dessus du masque, puis d'autres positions
-        const candidates = [
-          {
-            x: (maskBounds.minX + maskBounds.maxX) / 2 - labelWidth / 2,
-            y: maskBounds.minY - labelHeight - offset,
-          }, // Au-dessus
-          {
-            x: (maskBounds.minX + maskBounds.maxX) / 2 - labelWidth / 2,
-            y: maskBounds.maxY + offset,
-          }, // En-dessous
-          {
-            x: maskBounds.minX - labelWidth - offset,
-            y: (maskBounds.minY + maskBounds.maxY) / 2 - labelHeight / 2,
-          }, // À gauche
-          {
-            x: maskBounds.maxX + offset,
-            y: (maskBounds.minY + maskBounds.maxY) / 2 - labelHeight / 2,
-          }, // À droite
-        ];
-
-        let labelX, labelY;
-        let foundPosition = false;
-
-        for (const candidate of candidates) {
-          // Clamp la position de l'étiquette aux limites du canevas
-          const tempX = Math.max(
-            padding,
-            Math.min(candidate.x, canvas.width - labelWidth - padding)
-          );
-          const tempY = Math.max(
-            padding,
-            Math.min(candidate.y, canvas.height - labelHeight - padding)
-          );
-
-          const labelRect = {
-            x: tempX,
-            y: tempY,
-            width: labelWidth,
-            height: labelHeight,
+              const resizedImgElement = new Image();
+              resizedImgElement.onload = () => {
+                resetStateForNewImage();
+                image = {
+                  file_name: file.name,
+                  dataURL: resizedDataURL,
+                  image: resizedImgElement,
+                  id: Date.now(),
+                  height: targetHeight,
+                  width: targetWidth,
+                  annotationIndex: 0,
+                };
+                initializeCanvas();
+                updateUIState();
+                setProgress(false);
+              };
+              resizedImgElement.src = resizedDataURL;
+            };
+            imgElement.src = e.target.result;
           };
+          reader.readAsDataURL(file);
+        };
 
-          // Vérifie les chevauchements avec les bords du canevas
-          if (
-            labelRect.x + labelRect.width > canvas.width ||
-            labelRect.y + labelRect.height > canvas.height ||
-            labelRect.x < 0 ||
-            labelRect.y < 0
-          ) {
-            continue; // Ignore si ça sort du canevas
+        const loadImageFromHistory = (historyEntry) => {
+          setProgress(true);
+          const imgElement = new Image();
+          imgElement.onload = () => {
+            resetStateForNewImage();
+            isViewOnly = true; // Définit le mode lecture seule.
+            image = {
+              file_name: historyEntry.fileName,
+              dataURL: historyEntry.imageData,
+              image: imgElement,
+              id: historyEntry.imageId,
+              height: imgElement.height,
+              width: imgElement.width,
+            };
+            // Charge une copie profonde des annotations pour ne pas modifier l'historique d'origine.
+            annotations.push(
+              ...JSON.parse(JSON.stringify(historyEntry.annotations))
+            );
+            // Calcule le prochain index d'annotation pour éviter les conflits si l'on sort du mode lecture seule.
+            image.annotationIndex =
+              annotations.reduce(
+                (max, anno) => Math.max(max, anno.id % 1000),
+                0
+              ) + 1;
+
+            initializeCanvas();
+            updateUIState();
+            setProgress(false);
+          };
+          imgElement.src = historyEntry.imageData;
+        };
+
+        const initializeCanvas = () => {
+          if (!image) return;
+          els.canvas.width = canvasArea.clientWidth;
+          els.canvas.height = canvasArea.clientHeight;
+          redrawCanvas();
+        };
+
+        const redrawCanvas = () => {
+          if (!image) return;
+          ctx.clearRect(0, 0, els.canvas.width, els.canvas.height);
+          const imgRatio = image.width / image.height;
+          const canvasRatio = els.canvas.width / els.canvas.height;
+          let dw, dh, dx, dy;
+          if (imgRatio > canvasRatio) {
+            dw = els.canvas.width;
+            dh = dw / imgRatio;
+            dx = 0;
+            dy = (els.canvas.height - dh) / 2;
+          } else {
+            dh = els.canvas.height;
+            dw = dh * imgRatio;
+            dy = 0;
+            dx = (els.canvas.width - dw) / 2;
+          }
+          currentImageRenderInfo = { x: dx, y: dy, width: dw, height: dh };
+          ctx.drawImage(image.image, dx, dy, dw, dh);
+
+          const labelRects = [];
+          if (showAnnotations) {
+            annotations.forEach((anno) => drawAnnotation(anno, labelRects));
+          }
+          if (isDrawing && maskPoints.length > 0) {
+            drawCurrentMask();
+          }
+        };
+
+        const drawPolygon = (points) => {
+          if (points.length < 2) return;
+          ctx.beginPath();
+          ctx.moveTo(points[0], points[1]);
+          for (let i = 2; i < points.length; i += 2) {
+            ctx.lineTo(points[i], points[i + 1]);
+          }
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+        };
+
+        const drawLabel = (text, scaledMaskPoints, category, labelRects) => {
+          const fontSize = 12;
+          ctx.font = `bold ${fontSize}px Inter`;
+          const padding = 4;
+          const textMetrics = ctx.measureText(text);
+          const rectWidth = textMetrics.width + padding * 2;
+          const rectHeight = fontSize + padding * 2;
+
+          let minX = Infinity,
+            maxX = -Infinity,
+            minY = Infinity;
+          for (let i = 0; i < scaledMaskPoints.length; i += 2) {
+            minX = Math.min(minX, scaledMaskPoints[i]);
+            maxX = Math.max(maxX, scaledMaskPoints[i]);
+            minY = Math.min(minY, scaledMaskPoints[i + 1]);
           }
 
-          // Vérifie le chevauchement avec le masque lui-même (vérification simplifiée)
-          const isOverlappingMask =
-            labelRect.x < maskBounds.maxX &&
-            labelRect.x + labelRect.width > maskBounds.minX &&
-            labelRect.y < maskBounds.maxY &&
-            labelRect.y + labelRect.height > maskBounds.minY;
+          let labelX = (minX + maxX) / 2 - rectWidth / 2;
+          let labelY = minY - rectHeight - 5;
 
-          if (isOverlappingMask) {
-            continue; // Ignore si ça chevauche son propre masque
-          }
-
-          // Vérifie le chevauchement avec les étiquettes déjà dessinées
-          const isOverlappingLabel = labelRects.some(
-            (existingRect) =>
-              labelRect.x < existingRect.x + existingRect.width &&
-              labelRect.x + labelRect.width > existingRect.x &&
-              labelRect.y < existingRect.y + existingRect.height &&
-              labelRect.y + existingRect.height > existingRect.y
-          );
-
-          if (!isOverlappingLabel) {
-            labelX = tempX;
-            labelY = tempY;
-            foundPosition = true;
-            labelRects.push(labelRect);
-            break;
-          }
-        }
-
-        // Repli si aucune position idéale n'est trouvée (peut se chevaucher)
-        if (!foundPosition) {
+          // Assure que le label reste dans les limites du canvas.
           labelX = Math.max(
             padding,
-            Math.min(
-              (maskBounds.minX + maskBounds.maxX) / 2 - labelWidth / 2,
-              canvas.width - labelWidth - padding
-            )
+            Math.min(labelX, els.canvas.width - rectWidth - padding)
           );
           labelY = Math.max(
             padding,
-            Math.min(
-              maskBounds.minY - labelHeight - offset,
-              canvas.height - labelHeight - padding
-            )
+            Math.min(labelY, els.canvas.height - rectHeight - padding)
           );
+
+          // Évite le chevauchement basique des labels.
+          let isOverlapping = labelRects.some(
+            (r) =>
+              labelX < r.x + r.width &&
+              labelX + rectWidth > r.x &&
+              labelY < r.y + r.height &&
+              labelY + rectHeight > r.y
+          );
+          if (isOverlapping) labelY = Math.max(minY, labelY) + rectHeight + 5;
+
           labelRects.push({
             x: labelX,
             y: labelY,
-            width: labelWidth,
-            height: labelHeight,
+            width: rectWidth,
+            height: rectHeight,
           });
-        }
 
-        context.fillStyle = "rgba(15, 15, 20, 0.7)";
-        context.fillRect(labelX, labelY, labelWidth, labelHeight);
-        context.fillStyle = defaultCategories[categoryId]?.color || "#ffffff";
-        context.fillText(
-          text,
-          labelX + padding * 2,
-          labelY + fontSize + padding
-        );
-      }
+          ctx.fillStyle = "rgba(15, 15, 20, 0.7)";
+          ctx.fillRect(labelX, labelY, rectWidth, rectHeight);
+          ctx.fillStyle = category.color;
+          ctx.textBaseline = "top";
+          ctx.fillText(text, labelX + padding, labelY + padding);
+        };
 
-      // Finalise le masque en cours de dessin et l'ajoute aux annotations
-      function finalizeMask() {
-        if (!image || isViewOnly) return; // Ne peut pas finaliser si pas d'image ou en lecture seule
-        if (maskPoints.length < 3) {
-          maskPoints = [];
-          isDrawing = false;
-          redrawCanvas();
-          return;
-        }
+        const drawAnnotation = (anno, labelRects) => {
+          const category = CATEGORIES[anno.category_id];
+          if (!category) return;
 
-        // maskPoints contient des coordonnées relatives à la zone de dessin de l'image sur le canevas.
-        // Nous devons les convertir en coordonnées d'image d'origine et les arrondir à l'unité.
-        const scaleX = image.width / currentImageRenderInfo.width;
-        const scaleY = image.height / currentImageRenderInfo.height;
-
-        const originalImageMaskPoints = maskPoints.map((p) => ({
-          x: Math.round(p.x * scaleX), // Arrondi à l'unité
-          y: Math.round(p.y * scaleY), // Arrondi à l'unité
-        }));
-
-        const xs = originalImageMaskPoints.map((p) => p.x);
-        const ys = originalImageMaskPoints.map((p) => p.y);
-        const minX = Math.min(...xs);
-        const maxX = Math.max(...xs);
-        const minY = Math.min(...ys);
-        const maxY = Math.max(...ys);
-        const area = calculatePolygonArea(originalImageMaskPoints);
-
-        const segmentation = polygonToCocoFormat(originalImageMaskPoints);
-
-        annotations.push({
-          id: image.id * 10 + image.annotationIndex++, // Utilise image.id et incrémente l'index des annotations
-          image_id: image.id,
-          category_id: currentCategory,
-          // Arrondi les coordonnées de la bbox à l'unité
-          bbox: [
-            Math.round(minX),
-            Math.round(minY),
-            Math.round(maxX - minX),
-            Math.round(maxY - minY),
-          ],
-          area: Math.round(area), // Arrondi l'aire
-          segmentation: segmentation,
-          iscrowd: 0,
-        });
-
-        maskPoints = [];
-        isDrawing = false;
-        undoneAnnotations = []; // Efface l'historique d'annulation sur une nouvelle annotation
-        redrawCanvas();
-        isSaved = false; // Marque comme non sauvegardé
-      }
-
-      // Calcule l'aire d'un polygone
-      function calculatePolygonArea(points) {
-        let area = 0;
-        for (let i = 0; i < points.length; i++) {
-          const j = (i + 1) % points.length;
-          area += points[i].x * points[j].y;
-          area -= points[j].x * points[i].y;
-        }
-        return Math.abs(area / 2);
-      }
-
-      // Convertit les points du polygone au format COCO (tableau de nombres plat)
-      function polygonToCocoFormat(maskPoints) {
-        const segmentation = [];
-        maskPoints.forEach((point) => {
-          segmentation.push(Math.round(point.x));
-          segmentation.push(Math.round(point.y));
-        });
-        return [segmentation]; // Tableau de tableaux pour la compatibilité COCO
-      }
-
-      // Convertit la segmentation COCO (tableau de nombres plat) en tableau de points {x,y}
-      function convertSegmentationToPoints(rawSegmentationData) {
-        const points = [];
-        let segments;
-
-        // Si l'entrée est une chaîne (provenant d'un ancien historique où la segmentation était stringifiée)
-        if (typeof rawSegmentationData === "string") {
-          try {
-            segments = JSON.parse(rawSegmentationData);
-          } catch (e) {
-            console.error(
-              "Error parsing rawSegmentationData string:",
-              e,
-              rawSegmentationData
-            );
-            return [];
-          }
-        } else if (Array.isArray(rawSegmentationData)) {
-          // Si c'est déjà un tableau (ce qui devrait être le cas pour les nouvelles sauvegardes)
-          segments = rawSegmentationData;
-        } else {
-          console.error(
-            "Unexpected rawSegmentationData type:",
-            rawSegmentationData
+          const scaleX = currentImageRenderInfo.width / image.width;
+          const scaleY = currentImageRenderInfo.height / image.height;
+          const scaledMask = anno.segmentation[0].map((val, i) =>
+            i % 2 === 0
+              ? val * scaleX + currentImageRenderInfo.x
+              : val * scaleY + currentImageRenderInfo.y
           );
-          return [];
-        }
 
-        if (!segments) return [];
+          ctx.fillStyle = category.color
+            .replace("rgb", "rgba")
+            .replace(")", ", 0.3)");
+          ctx.strokeStyle = category.color;
+          ctx.lineWidth = 2;
 
-        for (let i = 0; i < segments.length; i += 2) {
-          points.push({
-            x: segments[i],
-            y: segments[i + 1],
+          drawPolygon(scaledMask);
+          drawLabel(category.displayName, scaledMask, category, labelRects);
+        };
+
+        const drawCurrentMask = () => {
+          ctx.strokeStyle = CATEGORIES[currentCategory].color;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          maskPoints.forEach((p, i) => {
+            const drawX = p.x + currentImageRenderInfo.x;
+            const drawY = p.y + currentImageRenderInfo.y;
+            i === 0 ? ctx.moveTo(drawX, drawY) : ctx.lineTo(drawX, drawY);
           });
-        }
-        return points;
-      }
+          ctx.stroke();
+        };
 
-      // Annule la dernière annotation ou le dessin en cours
-      function undoAnnotation() {
-        if (isViewOnly) return;
-        if (maskPoints.length > 0) {
-          // Si un dessin est en cours, efface le dessin actuel
-          maskPoints = [];
-          isDrawing = false;
-        } else {
-          // Sinon, annule la dernière annotation complétée
-          const lastAnnotation = annotations.pop();
-          if (lastAnnotation) {
-            undoneAnnotations.push(lastAnnotation);
-          }
-        }
-        redrawCanvas();
-        isSaved = false;
-      }
-
-      // Rétablit la dernière annotation annulée
-      function redoAnnotation() {
-        if (isViewOnly) return;
-        const lastUndone = undoneAnnotations.pop();
-        if (lastUndone) {
-          annotations.push(lastUndone);
-          redrawCanvas();
-          isSaved = false;
-        }
-      }
-
-      // Efface toutes les annotations
-      function clearAllAnnotations() {
-        if (isViewOnly) return;
-        if (annotations.length === 0 && maskPoints.length === 0) return;
-
-        showConfirmModal(
-          "Supprimer toutes les annotations",
-          "Voulez-vous vraiment supprimer toutes les annotations ? Cette action est irréversible.",
-          () => {
-            if (annotations.length > 0) {
-              undoneAnnotations.push(...annotations); // Déplace vers la pile d'annulation
-            }
-            annotations.length = 0;
+        const finalizeMask = () => {
+          if (maskPoints.length < 3) {
             maskPoints = [];
             isDrawing = false;
             redrawCanvas();
-            isSaved = false;
+            return;
           }
-        );
-      }
+          const scaleX = image.width / currentImageRenderInfo.width;
+          const scaleY = image.height / currentImageRenderInfo.height;
 
-      // Sélectionne une catégorie d'annotation
-      function selectCategory(categoryId) {
-        if (!defaultCategories[categoryId]) return;
-        if (isViewOnly) return;
+          const segmentation = [[]];
+          let minX = Infinity,
+            minY = Infinity,
+            maxX = -Infinity,
+            maxY = -Infinity;
 
-        currentCategory = categoryId;
-        document.querySelectorAll(".category-btn").forEach((btn) => {
-          btn.classList.remove("active");
-        });
-        const button = document.getElementById(`cat${categoryId}`);
-        if (button) {
-          button.classList.add("active");
-        }
-      }
+          maskPoints.forEach((p) => {
+            const originalX = Math.round(p.x * scaleX);
+            const originalY = Math.round(p.y * scaleY);
+            segmentation[0].push(originalX, originalY);
+            minX = Math.min(minX, originalX);
+            minY = Math.min(minY, originalY);
+            maxX = Math.max(maxX, originalX);
+            maxY = Math.max(maxY, originalY);
+          });
 
-      // Sauvegarde toutes les annotations au format COCO et l'image annotée
-      function saveAll() {
-        if (!image) return;
+          annotations.push({
+            id: image.id * 1000 + image.annotationIndex++,
+            image_id: image.id,
+            category_id: currentCategory,
+            bbox: [minX, minY, maxX - minX, maxY - minY],
+            area: 0,
+            segmentation: segmentation,
+            iscrowd: 0,
+          });
 
-        progressOverlay.classList.add("active"); // Active l'animation de chargement
-
-        // Crée un canevas temporaire pour l'image annotée
-        const outputCanvas = document.createElement("canvas");
-        outputCanvas.width = image.width;
-        outputCanvas.height = image.height;
-        const outputCtx = outputCanvas.getContext("2d");
-
-        // Dessine l'image originale
-        outputCtx.drawImage(image.image, 0, 0, image.width, image.height);
-
-        const labelRects = [];
-        // Dessine toutes les annotations et les étiquettes
-        annotations.forEach((anno) => {
-          const category = defaultCategories[anno.category_id];
-          if (!category) return;
-
-          outputCtx.strokeStyle = category.color;
-          outputCtx.fillStyle = category.color
-            .replace("rgb", "rgba")
-            .replace(")", ", 0.2)");
-          outputCtx.lineWidth = 2;
-
-          const maskPointsOriginal = convertSegmentationToPoints(
-            anno.segmentation[0]
-          );
-          drawPolygon(maskPointsOriginal, outputCtx); // Dessine le masque à la résolution originale
-
-          drawLabel(
-            category.displayName,
-            maskPointsOriginal,
-            category.id,
-            labelRects,
-            outputCtx
-          );
-        });
-
-        const baseFileName = image.file_name.split(".")[0];
-        const outputFileName = `${baseFileName}_annotated`;
-
-        // Prépare les annotations pour la sauvegarde du JSON
-        const annotationsToSave = annotations.map((anno) => {
-          // Créer une copie de l'annotation pour ne pas modifier l'original dans l'état de l'application
-          const annoCopy = { ...anno };
-          // S'assure que la segmentation est un tableau de nombres, et non une chaîne pour la sortie JSON.
-          // Ceci est pour la rétrocompatibilité avec les données d'historique potentiellement stringifiées.
-          if (typeof annoCopy.segmentation[0] === "string") {
-            try {
-              annoCopy.segmentation = [JSON.parse(annoCopy.segmentation[0])];
-            } catch (e) {
-              console.error(
-                "Error parsing segmentation string for JSON output:",
-                e,
-                annoCopy.segmentation[0]
-              );
-              annoCopy.segmentation = [[]]; // Fallback
-            }
-          }
-          return annoCopy;
-        });
-
-        // Crée les données JSON au format COCO
-        const imageForJson = {
-          file_name: image.file_name,
-          height: image.height,
-          width: image.width,
-          id: image.id,
-          // Ajout des champs spécifiques pour correspondre au format fourni
-          video_id: null, // Si non pertinent, peut être 0 ou null
-          frame_id: null,
-          is_det_keyframe: true,
-          is_ds_keyframe: true,
-          ds: [0.0, 0.0, 0.0],
+          maskPoints = [];
+          isDrawing = false;
+          undoneAnnotations = [];
+          isSaved = false;
+          redrawCanvas();
         };
 
-        const jsonData = {
-          images: [imageForJson],
-          annotations: annotationsToSave, // Utilise les annotations avec la segmentation correctement formatée
-          categories: Object.values(defaultCategories).map((cat) => ({
-            id: cat.id,
-            name: cat.name,
-            supercategory: cat.supercategory,
-          })),
-          info: { description: "Anatomy Annotator Dataset" },
+        const selectCategory = (id) => {
+          if (isViewOnly) return; // Empêche la sélection de catégorie en mode lecture seule.
+          currentCategory = parseInt(id);
+          document.querySelectorAll(".category-btn").forEach((btn) => {
+            btn.classList.toggle(
+              "active",
+              parseInt(btn.dataset.category) === currentCategory
+            );
+          });
         };
 
-        // Télécharge le fichier JSON
-        const jsonStr = JSON.stringify(jsonData, null, 2);
-        const jsonBlob = new Blob([jsonStr], { type: "application/json" });
-        const jsonUrl = URL.createObjectURL(jsonBlob);
-        const jsonLink = document.createElement("a");
-        jsonLink.href = jsonUrl;
-        jsonLink.download = `${outputFileName}.json`;
-        jsonLink.click();
-        URL.revokeObjectURL(jsonUrl);
-
-        // Ajoute à l'historique de session
-        addToHistory(image.file_name, image.dataURL, annotations, image.id);
-
-        isSaved = true; // Marque comme sauvegardé
-        progressOverlay.classList.remove("active"); // Désactive l'animation de chargement
-      }
-
-      // Ajoute une entrée à l'historique des images annotées
-      function addToHistory(fileName, imageData, annotations, imageId) {
-        let history = localStorage.getItem("annotatedImageHistory");
-        history = history ? JSON.parse(history) : [];
-
-        // Supprime l'entrée existante pour cette image si elle existe, pour la mettre à jour
-        history = history.filter((entry) => entry.fileName !== fileName);
-
-        // Créer une copie des annotations pour l'historique, en s'assurant que la segmentation est un tableau de nombres
-        const annotationsForHistory = annotations.map((anno) => {
-          const annoCopy = { ...anno };
-          // S'assure que la segmentation est un tableau de nombres avant de la stocker dans l'historique
-          // Cela est crucial si le format de sortie JSON change et que l'historique doit toujours lire le bon type
-          if (typeof annoCopy.segmentation[0] === "string") {
-            try {
-              annoCopy.segmentation = [JSON.parse(annoCopy.segmentation[0])];
-            } catch (e) {
-              console.error(
-                "Error parsing segmentation string for history storage:",
-                e,
-                annoCopy.segmentation[0]
-              );
-              annoCopy.segmentation = [[]]; // Fallback
-            }
+        // --- ACTIONS & SAUVEGARDE ---
+        const undo = () => {
+          if (isViewOnly) return; // Empêche l'annulation en mode lecture seule.
+          if (maskPoints.length > 0) {
+            maskPoints = [];
+            isDrawing = false;
+          } else if (annotations.length > 0) {
+            undoneAnnotations.push(annotations.pop());
           }
-          return annoCopy;
-        });
-
-        history.push({
-          fileName: fileName,
-          imageData: imageData, // Stocke les données de l'image en base64
-          annotations: annotationsForHistory, // Stocke les annotations actuelles (avec segmentation parsée si besoin)
-          imageId: imageId,
-          timestamp: new Date().toISOString(), // Ajoute un horodatage
-        });
-
-        // Garde l'historique à une taille raisonnable (ex: les 10 dernières images)
-        if (history.length > 10) {
-          history = history.slice(history.length - 10);
-        }
-
-        localStorage.setItem("annotatedImageHistory", JSON.stringify(history));
-      }
-
-      // Convertit les coordonnées client (souris/toucher) en coordonnées de la zone de dessin de l'image sur le canevas
-      function getTransformedPos(clientX, clientY) {
-        if (!image || !canvas) return { x: 0, y: 0 };
-
-        const rect = canvas.getBoundingClientRect(); // Dimensions du canevas affiché à l'écran
-
-        // Coordonnées du client par rapport au viewport, converties en coordonnées internes du canevas
-        const xInternalCanvas =
-          (clientX - rect.left) * (canvas.width / rect.width);
-        const yInternalCanvas =
-          (clientY - rect.top) * (canvas.height / rect.height);
-
-        // Coordonnées par rapport à la zone où l'image est dessinée sur le canevas (compte tenu de object-fit: contain)
-        const xInImageDrawingArea = xInternalCanvas - currentImageRenderInfo.x;
-        const yInImageDrawingArea = yInternalCanvas - currentImageRenderInfo.y;
-
-        // Vérifie si le point est en dehors de la zone réelle de l'image (les barres noires)
-        if (
-          xInImageDrawingArea < 0 ||
-          xInImageDrawingArea > currentImageRenderInfo.width ||
-          yInImageDrawingArea < 0 ||
-          yInImageDrawingArea > currentImageRenderInfo.height
-        ) {
-          return { x: -1, y: -1 }; // Indique en dehors des limites de l'image
-        }
-
-        return { x: xInImageDrawingArea, y: yInImageDrawingArea };
-      }
-
-      // --- Gestionnaires d'événements ---
-
-      function handleTouchStart(e) {
-        e.preventDefault(); // Empêche le défilement et le zoom
-        if (!image || isViewOnly) return;
-        const touch = e.touches[0];
-        const { x, y } = getTransformedPos(touch.clientX, touch.clientY);
-        if (x < 0 || y < 0) return; // Hors de la zone de l'image
-        if (e.touches.length === 1) {
-          isDrawing = true;
-          maskPoints = [{ x, y }]; // Stocke les coordonnées relatives à la zone de dessin de l'image
+          isSaved = false;
           redrawCanvas();
-        }
-      }
-
-      function handleTouchMove(e) {
-        e.preventDefault(); // Empêche le défilement
-        if (!image || isViewOnly || !isDrawing) return;
-        const touch = e.touches[0];
-        const { x, y } = getTransformedPos(touch.clientX, touch.clientY);
-        if (x < 0 || y < 0) return; // Hors de la zone de l'image
-
-        const lastPoint = maskPoints[maskPoints.length - 1];
-        const distance = Math.sqrt(
-          (x - lastPoint.x) ** 2 + (y - lastPoint.y) ** 2
-        );
-        if (distance > 1) {
-          maskPoints.push({ x, y });
+        };
+        const redo = () => {
+          if (isViewOnly || undoneAnnotations.length === 0) return; // Empêche la répétition en mode lecture seule.
+          annotations.push(undoneAnnotations.pop());
+          isSaved = false;
           redrawCanvas();
-        }
-      }
-
-      function handleTouchEnd(e) {
-        e.preventDefault();
-        if (!image || isViewOnly || !isDrawing) return;
-        isDrawing = false;
-        finalizeMask();
-      }
-
-      function handleMouseDown(e) {
-        if (!image || isViewOnly || e.button !== 0) return; // Seulement le clic gauche
-        e.preventDefault(); // Empêche le comportement de glisser-déposer par défaut du navigateur
-        const { x, y } = getTransformedPos(e.clientX, e.clientY);
-        if (x < 0 || y < 0) return; // Hors de la zone de l'image
-        isDrawing = true;
-        maskPoints = [{ x, y }]; // Stocke les coordonnées relatives à la zone de dessin de l'image
-        redrawCanvas();
-      }
-
-      function handleMouseMove(e) {
-        if (!image || isViewOnly || !isDrawing) return;
-        e.preventDefault(); // Empêche la sélection de texte
-        const { x, y } = getTransformedPos(e.clientX, e.clientY);
-        if (x < 0 || y < 0) return; // Hors de la zone de l'image
-
-        const lastPoint = maskPoints[maskPoints.length - 1];
-        const distance = Math.sqrt(
-          (x - lastPoint.x) ** 2 + (y - lastPoint.y) ** 2
-        );
-        if (distance > 1) {
-          maskPoints.push({ x, y });
-          redrawCanvas();
-        }
-      }
-
-      function handleMouseUp(e) {
-        if (!image || isViewOnly || !isDrawing) return;
-        isDrawing = false;
-        finalizeMask();
-      }
-
-      function handleContextMenu(e) {
-        e.preventDefault(); // Empêche le menu contextuel du clic droit
-      }
-
-      // Met à jour l'état activé/désactivé des boutons de la barre d'outils
-      function updateToolbarButtonsState() {
-        const buttonsToDisable = [
-          "undoBtn",
-          "redoBtn",
-          "clearAllBtn",
-          "saveBtn",
-        ];
-        buttonsToDisable.forEach((id) => {
-          const button = document.getElementById(id);
-          if (button) {
-            button.disabled = isViewOnly;
-            button.classList.toggle("disabled", isViewOnly);
-          }
-        });
-        document.querySelectorAll(".category-btn").forEach((button) => {
-          button.disabled = isViewOnly;
-          button.classList.toggle("disabled", isViewOnly);
-          if (isViewOnly) {
-            button.classList.remove("active"); // Désactive la catégorie active en mode lecture seule
-          }
-        });
-        // Removed default active state for category:
-        // if (!isViewOnly) {
-        //   selectCategory(currentCategory); // Réactive la catégorie actuelle si non en lecture seule
-        // }
-      }
-
-      // Configure les écouteurs d'événements pour le canevas
-      function setupCanvasEventListeners() {
-        // Supprime les écouteurs existants pour éviter les doublons
-        canvas.removeEventListener("touchstart", handleTouchStart);
-        canvas.removeEventListener("touchmove", handleTouchMove);
-        canvas.removeEventListener("touchend", handleTouchEnd);
-        canvas.removeEventListener("mousedown", handleMouseDown);
-        canvas.removeEventListener("mousemove", handleMouseMove);
-        canvas.removeEventListener("mouseup", handleMouseUp);
-        canvas.removeEventListener("contextmenu", handleContextMenu);
-        canvas.removeEventListener("mouseleave", handleMouseUp);
-
-        if (!isViewOnly) {
-          // Ajoute les écouteurs si non en mode lecture seule
-          canvas.addEventListener("touchstart", handleTouchStart, {
-            passive: false,
-          });
-          canvas.addEventListener("touchmove", handleTouchMove, {
-            passive: false,
-          });
-          canvas.addEventListener("touchend", handleTouchEnd, {
-            passive: false,
-          });
-          canvas.addEventListener("mousedown", handleMouseDown);
-          canvas.addEventListener("mousemove", handleMouseMove);
-          canvas.addEventListener("mouseup", handleMouseUp);
-          canvas.addEventListener("mouseleave", handleMouseUp); // Arrête le dessin si la souris quitte le canevas
-          canvas.addEventListener("contextmenu", handleContextMenu);
-        }
-        updateToolbarButtonsState(); // Met à jour l'état des boutons en fonction du mode lecture seule
-      }
-
-      // Bascule l'affichage des annotations
-      function toggleAnnotations() {
-        showAnnotations = !showAnnotations;
-        const toggleBtn = document.getElementById("toggleAnnotationsBtn");
-        toggleBtn.innerHTML = showAnnotations
-          ? '<i class="fas fa-eye"></i>'
-          : '<i class="fas fa-eye-slash"></i>';
-        toggleBtn.classList.toggle("active", showAnnotations);
-        redrawCanvas();
-      }
-
-      // --- Configuration principale ---
-      document.addEventListener("DOMContentLoaded", () => {
-        setupConstellationBackground();
-        setupModals();
-
-        // Gestionnaire de redimensionnement de la fenêtre
-        window.addEventListener(
-          "resize",
-          debounce(() => {
-            if (image) {
-              initializeCanvas(); // Réinitialise le canevas pour s'adapter à la nouvelle taille
+        };
+        const clearAll = () => {
+          if (
+            isViewOnly ||
+            (annotations.length === 0 && maskPoints.length === 0)
+          )
+            return; // Empêche d'effacer en mode lecture seule ou s'il n'y a rien à effacer.
+          showConfirmModal(
+            "Tout effacer",
+            "Voulez-vous vraiment supprimer toutes les annotations ?",
+            () => {
+              annotations.length = 0;
+              maskPoints = [];
+              isDrawing = false;
+              isSaved = false;
+              redrawCanvas();
             }
-            if (constellationCanvas) {
-              setupConstellationBackground(); // Régénère les étoiles pour la nouvelle taille
-            }
-          }, 200)
-        );
-
-        // Gestion du glisser-déposer pour la zone du canevas
-        ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
-          canvasArea.addEventListener(
-            eventName,
-            (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            },
-            false
           );
-        });
+        };
 
-        canvasArea.addEventListener(
-          "drop",
-          (e) => {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            if (files.length > 0 && files[0].type.startsWith("image/")) {
-              if (!isSaved && annotations.length > 0) {
-                showImageChangeModal(files[0]);
-              } else {
-                loadImage(files[0]);
-              }
-            }
-          },
-          false
-        );
+        const saveAll = () => {
+          if (!image) return;
+          if (annotations.length === 0) {
+            showNoAnnotationMessage(); // Affiche le message "Pas d'annotations".
+            return;
+          }
 
-        // --- Gestionnaires de clics des boutons ---
-        document.getElementById("newImageBtn").addEventListener("click", () => {
-          const imageInput = document.getElementById("imageInput");
-          if (!isSaved && annotations.length > 0) {
-            showImageChangeModal(imageInput.files[0]);
+          setProgress(true);
+          const jsonData = {
+            images: [
+              {
+                file_name: image.file_name,
+                height: image.height,
+                width: image.width,
+                id: image.id,
+              },
+            ],
+            annotations: annotations,
+            categories: Object.values(CATEGORIES),
+          };
+          const jsonBlob = new Blob([JSON.stringify(jsonData, null, 2)], {
+            type: "application/json",
+          });
+          const url = URL.createObjectURL(jsonBlob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${image.file_name.split(".")[0]}_annotations.json`;
+          a.click();
+          URL.revokeObjectURL(url);
+
+          // Utilise l'image originale pour l'historique (pas de réduction de qualité).
+          const historyEntry = {
+            fileName: image.file_name,
+            imageData: image.dataURL,
+            annotations: JSON.parse(JSON.stringify(annotations)), // Copie profonde des annotations.
+            imageId: image.id,
+            timestamp: new Date().toISOString(),
+          };
+          // Supprime l'ancienne entrée si le même fichier est resauvegardé pour éviter les doublons.
+          let history = getHistory().filter(
+            (item) => item.fileName !== historyEntry.fileName
+          );
+          history.push(historyEntry);
+          saveHistory(history);
+
+          isSaved = true;
+          setProgress(false);
+        };
+
+        const checkUnsavedChanges = (callback) => {
+          // Vérifie si une image est chargée, s'il y a des annotations et si elles ne sont pas sauvegardées.
+          if (image && annotations.length > 0 && !isSaved) {
+            toggleModal("imageChangeModal", true);
+            els.saveAndChangeBtn.onclick = () => {
+              saveAll();
+              callback(); // Exécute le callback immédiatement après saveAll.
+              toggleModal("imageChangeModal", false);
+            };
+            els.changeWithoutSavingBtn.onclick = () => {
+              isSaved = true; // Marque comme sauvegardé pour éviter la boucle de confirmation.
+              callback();
+              toggleModal("imageChangeModal", false);
+            };
           } else {
-            imageInput.value = ""; // Efface la sélection précédente pour que l'événement 'change' se déclenche même si le même fichier est sélectionné
-            imageInput.click();
+            callback();
           }
-        });
+        };
 
-        document
-          .getElementById("imageInput")
-          .addEventListener("change", (e) => {
-            if (e.target.files.length > 0) {
-              loadImage(e.target.files[0]);
-            }
+        // --- GESTION DES ÉVÉNEMENTS ---
+        const getTransformedPos = (clientX, clientY) => {
+          const rect = els.canvas.getBoundingClientRect();
+          const x =
+            (clientX - rect.left) * (els.canvas.width / rect.width) -
+            currentImageRenderInfo.x;
+          const y =
+            (clientY - rect.top) * (els.canvas.height / rect.height) -
+            currentImageRenderInfo.y;
+          // Retourne null si le clic est en dehors de l'image rendue sur le canvas.
+          if (
+            x < 0 ||
+            y < 0 ||
+            x > currentImageRenderInfo.width ||
+            y > currentImageRenderInfo.height
+          ) {
+            return null;
+          }
+          return { x, y };
+        };
+
+        const handleDrawStart = (e) => {
+          if (isViewOnly || !image) return; // Empêche le dessin en mode lecture seule ou sans image.
+          e.preventDefault();
+          const pos = getTransformedPos(
+            e.clientX ?? e.touches[0].clientX,
+            e.clientY ?? e.touches[0].clientY
+          );
+          if (!pos) return;
+          isDrawing = true;
+          maskPoints = [pos];
+        };
+
+        const handleDrawMove = (e) => {
+          if (!isDrawing) return;
+          e.preventDefault();
+          const pos = getTransformedPos(
+            e.clientX ?? e.touches[0].clientX,
+            e.clientY ?? e.touches[0].clientY
+          );
+          if (!pos) return;
+          maskPoints.push(pos);
+          redrawCanvas();
+        };
+
+        const handleDrawEnd = () => {
+          if (!isDrawing) return;
+          isDrawing = false;
+          finalizeMask();
+        };
+
+        // --- INITIALISATION ---
+        const init = () => {
+          setupModals();
+          updateUIState(); // Mise à jour initiale de l'interface utilisateur.
+
+          els.newImageBtn.onclick = () =>
+            checkUnsavedChanges(() => els.imageInput.click());
+          els.imageInput.onchange = (e) =>
+            e.target.files[0] && loadImage(e.target.files[0]);
+          els.saveBtn.onclick = debounce(saveAll, 300);
+          els.historyBtn.onclick = showHistoryModal;
+          els.clearHistoryBtn.onclick = clearAllHistory;
+
+          els.toggleAnnotationsBtn.onclick = () => {
+            showAnnotations = !showAnnotations;
+            els.toggleAnnotationsBtn.querySelector(
+              "i"
+            ).className = `fas fa-eye${showAnnotations ? "" : "-slash"}`;
+            redrawCanvas();
+          };
+          els.tutorialBtn.onclick = () => toggleModal("tutorialModal", true);
+          els.undoBtn.onclick = undo;
+          els.redoBtn.onclick = redo;
+          els.clearAllBtn.onclick = clearAll;
+
+          // Attache les écouteurs d'événements aux boutons de catégorie.
+          document.querySelectorAll(".category-btn").forEach((button) => {
+            button.onclick = () => selectCategory(button.dataset.category);
           });
 
-        document
-          .getElementById("saveBtn")
-          .addEventListener("click", debounce(saveAll, 300));
-
-        document
-          .getElementById("historyBtn")
-          .addEventListener("click", showHistoryModal);
-
-        document
-          .getElementById("toggleAnnotationsBtn")
-          .addEventListener("click", toggleAnnotations);
-
-        document
-          .getElementById("undoBtn")
-          .addEventListener("click", undoAnnotation);
-
-        document
-          .getElementById("redoBtn")
-          .addEventListener("click", redoAnnotation);
-
-        document
-          .getElementById("clearAllBtn")
-          .addEventListener("click", clearAllAnnotations);
-
-        document.getElementById("backBtn").addEventListener("click", () =>
-          checkUnsavedChanges(() => {
-            // Remplace "index.html" par l'URL de votre page principale si nécessaire
-            window.location.href = "index.html";
-          })
-        );
-
-        document
-          .getElementById("tutorialBtn")
-          .addEventListener("click", () => showModal("tutorialModal"));
-
-        document.querySelectorAll(".category-btn").forEach((button) => {
-          button.addEventListener("click", function () {
-            if (!this.disabled) {
-              selectCategory(parseInt(this.dataset.category));
-            }
+          // Écouteurs d'événements pour le dessin sur le canvas (souris et tactile).
+          els.canvas.addEventListener("mousedown", handleDrawStart);
+          els.canvas.addEventListener("mousemove", handleDrawMove);
+          els.canvas.addEventListener("mouseup", handleDrawEnd);
+          els.canvas.addEventListener("mouseleave", handleDrawEnd);
+          els.canvas.addEventListener("touchstart", handleDrawStart, {
+            passive: false,
           });
-        });
+          els.canvas.addEventListener("touchmove", handleDrawMove, {
+            passive: false,
+          });
+          els.canvas.addEventListener("touchend", handleDrawEnd, {
+            passive: false,
+          });
+          els.canvas.addEventListener("contextmenu", (e) => e.preventDefault()); // Empêche le menu contextuel du clic droit.
 
-        // Initialisation de la catégorie par défaut (commenté pour ne pas activer par défaut)
-        // selectCategory(currentCategory);
-        // document.getElementById("toggleAnnotationsBtn").classList.add("active"); // Commenté pour ne pas activer par défaut
+          // Gestion du glisser-déposer d'images.
+          ["dragenter", "dragover", "dragleave", "drop"].forEach((evt) => {
+            canvasArea.addEventListener(
+              evt,
+              (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              },
+              false
+            );
+          });
+          canvasArea.addEventListener("drop", (e) => {
+            const file = e.dataTransfer.files[0];
+            checkUnsavedChanges(() => loadImage(file));
+          });
 
-        // Configure les écouteurs d'événements du canevas après l'initialisation
-        setupCanvasEventListeners();
+          // Raccourcis clavier (Annuler/Refaire).
+          window.addEventListener("keydown", (e) => {
+            if (document.querySelector(".modal-overlay.active")) return; // Ignorer les raccourcis si une modale est ouverte.
+            if (e.ctrlKey && e.key === "z") undo();
+            if (e.ctrlKey && e.key === "y") redo();
+          });
+
+          // Redimensionnement du canvas avec la fenêtre, avec debounce pour optimiser.
+          window.addEventListener("resize", debounce(initializeCanvas, 200));
+        };
+
+        // Lancement de l'initialisation de l'application.
+        init();
       });
     </script>
   </body>
